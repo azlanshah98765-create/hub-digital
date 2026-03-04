@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUB DIGITAL BPS</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="logo-bps.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hub BPS">
+  <meta name="application-name" content="Hub BPS">
+  <meta name="theme-color" content="#1a237e">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a237e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+      color: white;
+    }
+    img {
+      width: 100px;
+      animation: pulse 1.5s infinite;
+      margin-bottom: 20px;
+    }
+    p { font-size: 16px; font-weight: 600; }
+    span { font-size: 13px; opacity: 0.7; margin-top: 8px; }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+  </style>
+</head>
+<body>
+  <img src="logo-bps.png" alt="Logo BPS">
+  <p>HUB DIGITAL BPS</p>
+  <span>Memuatkan...</span>
+
+  <script>
+    // Redirect ke Apps Script selepas 1 saat
+    setTimeout(function() {
+      window.location.replace("https://script.google.com/macros/s/AKfycbxAayNzE48J_moSpnKJCdg4qEC8uvq2vLoFqM7TytdF67hkFOEsme4i4CItiAOLbtlYYA/exec");
+    }, 1000);
+  </script>
+</body>
+</html>
