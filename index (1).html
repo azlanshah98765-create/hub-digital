@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUB DIGITAL BPS</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="logo-bps.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Hub BPS">
+  <meta name="application-name" content="Hub BPS">
+  <meta name="theme-color" content="#1a237e">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #1a237e;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+    }
+
+    /* LOADING SCREEN */
+    #loadingScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    #loadingScreen img {
+      width: 90px;
+      animation: pulse 1.5s infinite;
+    }
+
+    #loadingScreen p {
+      font-size: 16px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    #loadingScreen span {
+      font-size: 13px;
+      opacity: 0.6;
+    }
+
+    /* INSTALL SCREEN */
+    #installScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .install-logo {
+      width: 80px;
+      border-radius: 20px;
+    }
+
+    .install-title {
+      font-size: 22px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .install-subtitle {
+      font-size: 13px;
+      opacity: 0.7;
+      text-align: center;
+      margin-top: -16px;
+    }
+
+    .steps {
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .step-num {
+      background: #3b82f6;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .step-text b { color: #93c5fd; }
+
+    #androidBtn {
+      display: none;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 99px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      max-width: 360px;
+      transition: 0.2s;
+    }
+
+    #androidBtn:active { transform: scale(0.97); }
+
+    .arrow-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.7;
+      font-size: 12px;
+    }
+
+    .arrow-bounce {
+      font-size: 28px;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+
+    .share-icon {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <img src="logo-bps.png" alt="Logo BPS">
+    <p>HUB DIGITAL BPS</p>
+    <span>Memuatkan...</span>
+  </div>
+
+  <!-- INSTALL INSTRUCTIONS -->
+  <div id="installScreen">
+    <img src="logo-bps.png" alt="Logo BPS" class="install-logo">
+    <div class="install-title">Pasang Aplikasi</div>
+    <div class="install-subtitle">Pasang untuk akses lebih pantas</div>
+
+    <!-- iOS Steps -->
+    <div class="steps" id="iosSteps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Tap butang <b>Share</b>
+          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
+          </svg>
+          di bawah browser</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Scroll ke bawah, pilih <b>"Add to Home Screen"</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Tap <b>"Add"</b> di penjuru kanan atas</div>
+      </div>
+    </div>
+
+    <!-- Android Steps -->
+    <div class="steps" id="androidSteps" style="display:none;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Tap butang <b>"Pasang"</b> di bawah ini</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Tap <b>"Install"</b> pada popup yang keluar</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">App akan tersimpan di <b>Home Screen</b> korang</div>
+      </div>
+    </div>
+
+    <button id="androidBtn" onclick="triggerInstall()">
+      📲 Pasang Aplikasi
+    </button>
+
+    <div class="arrow-indicator" id="iosArrow">
+      <span>Tap butang Share di bawah</span>
+      <div class="arrow-bounce">↓</div>
+    </div>
+
+  </div>
+
+  <script>
+    const APP_URL = "https://script.google.com/macros/s/AKfycbxAayNzE48J_moSpnKJCdg4qEC8uvq2vLoFqM7TytdF67hkFOEsme4i4CItiAOLbtlYYA/exec";
+
+    let deferredPrompt = null;
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    window.onload = function () {
+      if (isStandalone) {
+        redirectToApp();
+      } else {
+        setTimeout(showInstallScreen, 1500);
+      }
+    };
+
+    function redirectToApp() {
+      window.location.replace(APP_URL);
+    }
+
+    function showInstallScreen() {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('installScreen').style.display = 'flex';
+
+      if (isIOS) {
+        document.getElementById('iosSteps').style.display = 'flex';
+        document.getElementById('iosArrow').style.display = 'flex';
+        document.getElementById('androidSteps').style.display = 'none';
+      } else {
+        document.getElementById('androidSteps').style.display = 'flex';
+        document.getElementById('iosSteps').style.display = 'none';
+        document.getElementById('iosArrow').style.display = 'none';
+        document.getElementById('androidBtn').style.display = 'block';
+      }
+    }
+
+    function triggerInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((result) => {
+          if (result.outcome === 'accepted') {
+            redirectToApp();
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert('Tap ⋮ (3 titik) → "Add to Home Screen" untuk pasang app ini.');
+      }
+    }
+  </script>
+
+</body>
+</html>
