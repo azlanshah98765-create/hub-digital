@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e-Stok — Hub Digital BPS</title>
+  <meta name="theme-color" content="#040c18">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:        #040c18;
+      --surface:   #07111f;
+      --border:    rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.13);
+      --blue:      #2563eb;
+      --blue-mid:  #3b82f6;
+      --blue-glow: rgba(37,99,235,0.25);
+      --teal:      #0d9488;
+      --green:     #059669;
+      --amber:     #f59e0b;
+      --red:       #f87171;
+      --text:      #f0f4ff;
+      --text-2:    #94a3b8;
+      --text-3:    #475569;
+      --mono:      'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(37,99,235,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 90% 100%, rgba(13,148,136,0.07) 0%, transparent 60%);
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+      background-size: 52px 52px;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(4,12,24,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .hdr-left { display: flex; align-items: center; gap: 10px; }
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px;
+      color: var(--text-3); font-family: 'Sora', sans-serif;
+      font-size: 12px; cursor: pointer; transition: all .2s; text-decoration: none;
+    }
+    .back-btn:hover { border-color: var(--border-hi); color: var(--text); }
+    .hdr-title { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+    .hdr-title span {
+      background: linear-gradient(135deg, var(--blue-mid), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px; padding: 5px 12px 5px 5px;
+    }
+    .user-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: white;
+    }
+    .user-name-chip { font-size: 12px; font-weight: 600; }
+
+    /* MAIN */
+    main {
+      position: relative; z-index: 1;
+      max-width: 820px; margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* PAGE BANNER */
+    .page-banner {
+      background: linear-gradient(135deg, #0f1f3d 0%, #0a1628 60%, #051828 100%);
+      border: 1px solid var(--border-hi); border-radius: 20px;
+      padding: 24px 28px; margin-bottom: 28px;
+      position: relative; overflow: hidden;
+    }
+    .page-banner::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(13,148,136,0.5), transparent);
+    }
+    .page-banner::after {
+      content: '🗂️'; position: absolute; right: 28px; top: 50%;
+      transform: translateY(-50%); font-size: 64px; opacity: 0.07;
+    }
+    .banner-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .banner-sub   { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+
+    /* SECTION LABEL */
+    .slbl {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--text-3); margin: 24px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .slbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; margin-bottom: 14px;
+    }
+
+    /* AUTOFILL */
+    .autofill-bar {
+      display: none; align-items: center; justify-content: space-between;
+      background: rgba(13,148,136,0.08); border: 1px solid rgba(13,148,136,0.2);
+      border-radius: 10px; padding: 10px 14px; margin-bottom: 14px;
+      font-size: 12px; color: #2dd4bf; font-weight: 600;
+    }
+    .autofill-bar.show { display: flex; }
+    .autofill-clear {
+      background: transparent; border: 1px solid rgba(13,148,136,0.25);
+      border-radius: 6px; padding: 3px 10px; color: var(--text-3);
+      font-size: 11px; cursor: pointer; font-family: 'Sora', sans-serif; transition: all .2s;
+    }
+    .autofill-clear:hover { color: var(--text); border-color: var(--border-hi); }
+
+    /* PENDING WARNING */
+    .pending-warn {
+      display: none;
+      background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 16px; padding: 16px 18px; margin-bottom: 16px;
+    }
+    .pending-warn.show { display: block; }
+    .pending-warn-hdr {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .pending-warn-ico {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .pending-warn-title { font-size: 13px; font-weight: 800; color: var(--amber); }
+    .pending-warn-sub   { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+    .pending-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px;
+      background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12);
+      border-radius: 9px; margin-top: 6px;
+    }
+    .pending-item-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .pending-item-meta { font-size: 10px; color: var(--text-3); margin-top: 1px; font-family: var(--mono); }
+    .pending-item-qty  {
+      font-size: 11px; font-weight: 800; font-family: var(--mono);
+      color: var(--amber); background: rgba(245,158,11,0.12);
+      padding: 2px 8px; border-radius: 6px; flex-shrink: 0;
+    }
+    .pending-note {
+      font-size: 11px; color: var(--text-3); margin-top: 10px;
+      padding-top: 8px; border-top: 1px solid rgba(245,158,11,0.15);
+      line-height: 1.6;
+    }
+
+    /* FORM ELEMENTS */
+    .form-label {
+      display: block; font-family: var(--mono); font-size: 9px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-3); margin-bottom: 7px; margin-top: 16px;
+    }
+    .form-label:first-child { margin-top: 0; }
+    .form-input, .form-select {
+      width: 100%; padding: 11px 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input::placeholder { color: var(--text-3); }
+    .form-input:focus, .form-select:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .form-select {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .form-select option { background: #07111f; }
+    .form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .form-col { flex: 1; min-width: 180px; }
+
+    /* CATEGORY PILLS */
+    .cat-pills {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .cat-pill {
+      padding: 5px 12px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-3); font-family: 'Sora', sans-serif;
+      transition: all .18s; white-space: nowrap;
+    }
+    .cat-pill:hover  { border-color: var(--blue-mid); color: var(--blue-mid); }
+    .cat-pill.active {
+      background: rgba(37,99,235,0.12); border-color: rgba(37,99,235,0.35); color: var(--blue-mid);
+    }
+
+    /* SEARCH BOX */
+    .search-wrap { position: relative; margin-bottom: 10px; }
+    .search-icon {
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      color: var(--text-3); font-size: 13px; pointer-events: none;
+    }
+    .search-wrap .form-input { padding-left: 36px; }
+
+    /* BARANG LIST */
+    .barang-list {
+      display: flex; flex-direction: column; gap: 6px;
+      max-height: 280px; overflow-y: auto;
+      border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+    }
+    .barang-list::-webkit-scrollbar { width: 4px; }
+    .barang-list::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 99px; }
+
+    .barang-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1px solid transparent; cursor: pointer; transition: all .18s;
+    }
+    .barang-item:hover     { background: rgba(255,255,255,0.04); border-color: var(--border); }
+    .barang-item.sel       { background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.3); }
+    .barang-item.disabled  { opacity: 0.5; cursor: not-allowed; }
+    .barang-item-name      { font-size: 13px; font-weight: 700; color: var(--text); }
+    .barang-item-cat       { font-size: 10px; color: var(--text-3); margin-top: 2px; font-family: var(--mono); }
+    .barang-baki {
+      font-size: 11px; font-weight: 800; font-family: var(--mono);
+      background: rgba(5,150,105,0.12); color: #34d399;
+      padding: 2px 8px; border-radius: 6px; flex-shrink: 0;
+    }
+    .barang-baki.low   { background: rgba(245,158,11,0.12); color: var(--amber); }
+    .barang-baki.habis { background: rgba(255,255,255,0.04); color: var(--text-3); }
+
+    /* QTY STRIP */
+    .qty-strip {
+      display: none; align-items: center; gap: 10px;
+      background: rgba(37,99,235,0.07); border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 12px; padding: 12px 14px; margin-top: 10px;
+    }
+    .qty-strip.show { display: flex; }
+    .qty-strip-name { font-size: 13px; font-weight: 800; color: var(--blue-mid); flex: 1; }
+    .qty-strip-baki { font-size: 11px; color: var(--text-3); font-family: var(--mono); }
+    .qty-ctrl       { display: flex; align-items: center; gap: 8px; }
+    .qty-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+      color: var(--text); font-size: 16px; font-weight: 900;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all .15s; font-family: 'Sora', sans-serif;
+    }
+    .qty-btn:hover { border-color: var(--blue); color: var(--blue-mid); }
+    .qty-val {
+      font-size: 15px; font-weight: 900; color: var(--text);
+      min-width: 28px; text-align: center; font-family: var(--mono);
+    }
+    .btn-add-cart {
+      padding: 8px 16px; border: none; border-radius: 10px;
+      background: var(--blue); color: white;
+      font-family: 'Sora', sans-serif; font-weight: 700; font-size: 12px;
+      cursor: pointer; white-space: nowrap; transition: background .2s;
+    }
+    .btn-add-cart:hover { background: #1d4ed8; }
+
+    /* CART */
+    .cart-empty {
+      text-align: center; padding: 28px;
+      color: var(--text-3); font-size: 12px; font-weight: 600;
+    }
+    .cart-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px; margin-bottom: 8px;
+    }
+    .cart-item-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+    .cart-item-qty  {
+      font-size: 11px; font-weight: 800; font-family: var(--mono);
+      background: rgba(37,99,235,0.12); color: var(--blue-mid);
+      padding: 3px 10px; border-radius: 99px;
+    }
+    .cart-del {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-3); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all .15s;
+    }
+    .cart-del:hover { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.08); }
+
+    /* SUBMIT */
+    .btn-submit {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 15px; border: none; border-radius: 14px;
+      background: var(--blue); color: white;
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; box-shadow: 0 4px 20px var(--blue-glow);
+      transition: background .2s, transform .15s; margin-top: 8px;
+    }
+    .btn-submit:hover     { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-submit:active    { transform: scale(0.98); }
+    .btn-submit:disabled  { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ALERT */
+    .alert { display: none; padding: 14px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-top: 16px; line-height: 1.5; }
+    .alert.success { display: block; background: rgba(5,150,105,0.12);  border: 1px solid rgba(5,150,105,0.25);  color: #34d399; }
+    .alert.error   { display: block; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.25); color: var(--red); }
+
+    /* CONFIRM MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
+      z-index: 999; justify-content: center; align-items: flex-end;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #07111f; border: 1px solid var(--border-hi);
+      border-radius: 24px 24px 0 0; padding: 28px 24px 44px;
+      width: 100%; max-width: 480px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-handle { width: 40px; height: 4px; border-radius: 99px; background: var(--border); margin: 0 auto 20px; }
+    .modal-ico {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin: 0 auto 14px;
+    }
+    .modal-title { font-size: 16px; font-weight: 900; text-align: center; margin-bottom: 8px; }
+    .modal-body  {
+      font-size: 12px; color: var(--text-2); text-align: center;
+      line-height: 1.7; margin-bottom: 20px;
+    }
+    .modal-body strong { color: var(--amber); }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-btn-cancel {
+      flex: 1; padding: 14px; border: 1px solid var(--border); border-radius: 12px;
+      background: transparent; color: var(--text-3);
+      font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .modal-btn-cancel:hover { border-color: var(--border-hi); color: var(--text); }
+    .modal-btn-proceed {
+      flex: 1; padding: 14px; border: none; border-radius: 12px;
+      background: var(--amber); color: #1a0a00;
+      font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 800;
+      cursor: pointer; transition: filter .2s;
+    }
+    .modal-btn-proceed:hover { filter: brightness(1.1); }
+
+    /* SPINNER */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      main { padding: 20px 14px 80px; }
+      .form-row { flex-direction: column; }
+      .page-banner::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <a href="hub.html" class="back-btn">← Kembali</a>
+    <div class="hdr-title">e-<span>Stok</span></div>
+  </div>
+  <div class="user-chip">
+    <div class="user-avatar" id="userInitial">?</div>
+    <div class="user-name-chip" id="userName">—</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- BANNER -->
+  <div class="page-banner">
+    <div class="banner-title">🗂️ Sistem Stok Pejabat</div>
+    <div class="banner-sub">Yayasan Waqaf Malaysia — Mohon keperluan stok & alatan pejabat</div>
+  </div>
+
+  <!-- PENDING WARNING -->
+  <div class="pending-warn" id="pendingWarn">
+    <div class="pending-warn-hdr">
+      <div class="pending-warn-ico">⏳</div>
+      <div>
+        <div class="pending-warn-title">Anda Ada Permohonan Sedang Menunggu Kelulusan</div>
+        <div class="pending-warn-sub">Permohonan berikut belum diproses oleh admin</div>
+      </div>
+    </div>
+    <div id="pendingList"></div>
+    <div class="pending-note">⚠️ Sila tunggu sehingga permohonan semasa diproses sebelum membuat permohonan baru untuk barang yang sama. Jika tiada respon lebih 2 hari bekerja, hubungi BPS secara terus.</div>
+  </div>
+
+  <!-- MAKLUMAT PEMOHON -->
+  <div class="slbl">Maklumat Pemohon</div>
+
+  <div id="autofillBar" class="autofill-bar">
+    <span>⚡ Maklumat diisi semula — <span id="autofillName"></span></span>
+    <button class="autofill-clear" onclick="clearProfile()">Tukar Profil</button>
+  </div>
+
+  <div class="form-card">
+    <label class="form-label">Nama Pemohon</label>
+    <input type="text" class="form-input" id="nama" placeholder="Nama panggilan">
+
+    <div class="form-row">
+      <div class="form-col">
+        <label class="form-label">Emel Rasmi</label>
+        <input type="email" class="form-input" id="emel" placeholder="emel@ywm.gov.my">
+      </div>
+      <div class="form-col">
+        <label class="form-label">Bahagian</label>
+        <select class="form-select" id="bahagian">
+          <option value="" disabled selected>-- Pilih Bahagian --</option>
+          <option>Pejabat KPE</option>
+          <option>Kewangan (BKW)</option>
+          <option>Dasar & Pembangunan (BDP)</option>
+          <option>Pengurusan Dana (BPD)</option>
+          <option>Unit Undang-Undang (PUU)</option>
+          <option>Pemasaran & Korporat (BPK)</option>
+          <option>Pengurusan (BPS)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- PILIH BARANG -->
+  <div class="slbl">Pilih Barang</div>
+  <div class="form-card">
+
+    <!-- Category pills -->
+    <div class="cat-pills" id="catPills"></div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="form-input" id="searchBox"
+             placeholder="Cari nama barang..." oninput="renderBarangList()">
+    </div>
+
+    <div class="barang-list" id="barangList">
+      <div style="text-align:center;padding:20px;color:var(--text-3);font-size:12px;">
+        🔄 Memuatkan senarai barang...
+      </div>
+    </div>
+
+    <!-- QTY STRIP -->
+    <div class="qty-strip" id="qtyStrip">
+      <div style="flex:1">
+        <div class="qty-strip-name" id="qsName">—</div>
+        <div class="qty-strip-baki" id="qsBaki">Baki: —</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-val" id="qtyVal">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <button class="btn-add-cart" onclick="addToCart()">+ Tambah</button>
+    </div>
+
+  </div>
+
+  <!-- SENARAI PERMOHONAN / CART -->
+  <div class="slbl">Senarai Permohonan</div>
+  <div id="cartContainer">
+    <div class="cart-empty">📭 Belum ada barang dipilih</div>
+  </div>
+
+  <button class="btn-submit" id="submitBtn" onclick="hantar()">
+    📨 Hantar Permohonan
+  </button>
+
+  <div class="alert" id="alertMsg"></div>
+
+</main>
+
+<!-- CONFIRM MODAL: bypass pending warning -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-ico">⚠️</div>
+    <div class="modal-title">Makluman: Permohonan Sedia Ada</div>
+    <div class="modal-body">
+      Rekod sistem menunjukkan anda <strong>masih mempunyai permohonan yang sedang dalam proses kelulusan</strong>.<br><br>
+      Pertindihan permohonan boleh menyebabkan kekeliruan dalam pengurusan stok.<br><br>
+      Adakah anda ingin meneruskan penghantaran permohonan baru ini?
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal()">← Kembali</button>
+      <button class="modal-btn-proceed" onclick="confirmSubmit()">📨 Teruskan</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase, requireAuth, getProfile } from './js/supabase.js'
+
+  const PROFILE_KEY = 'stok_profil'
+  let userSession   = null
+  let barangAll     = []
+  let selectedBarang= null
+  let currentQty    = 1
+  let cart          = []
+  let selectedCat   = '__ALL__'
+  let hasPending    = false
+
+  // ── INIT ──
+  async function init() {
+    userSession = await requireAuth()
+    if (!userSession) return
+
+    const profile  = (await getProfile(userSession.user.id)).data
+    const nama     = profile?.nama     || userSession.user.email.split('@')[0]
+    const bahagian = profile?.bahagian || ''
+
+    document.getElementById('userInitial').textContent = nama.charAt(0).toUpperCase()
+    document.getElementById('userName').textContent    = nama
+
+    loadSavedProfile(nama, userSession.user.email, bahagian)
+
+    await Promise.all([
+      loadBarangList(),
+      checkPending()
+    ])
+  }
+
+  // ── LOAD BARANG LIST ──
+  async function loadBarangList() {
+    const { data, error } = await supabase
+      .from('stok_inventori')
+      .select('id, nama, kategori, baki')
+      .eq('aktif', true)
+      .order('kategori')
+      .order('nama')
+
+    if (error || !data) {
+      document.getElementById('barangList').innerHTML =
+        '<div style="text-align:center;padding:20px;color:var(--text-3);font-size:12px;">⚠️ Gagal memuatkan senarai barang.</div>'
+      return
+    }
+
+    barangAll = data
+    buildCatPills()
+    renderBarangList()
+  }
+
+  // ── CHECK PENDING ──
+  async function checkPending() {
+    const { data } = await supabase
+      .from('permohonan_stok')
+      .select('nama_barang, kuantiti, created_at')
+      .eq('user_id', userSession.user.id)
+      .eq('status', 'MENUNGGU')
+      .order('created_at', { ascending: false })
+
+    if (data && data.length > 0) {
+      hasPending = true
+      document.getElementById('pendingList').innerHTML = data.map(p => {
+        const tarikh = new Date(p.created_at).toLocaleDateString('ms-MY')
+        return `<div class="pending-item">
+          <div>
+            <div class="pending-item-name">${p.nama_barang}</div>
+            <div class="pending-item-meta">${tarikh}</div>
+          </div>
+          <span class="pending-item-qty">×${p.kuantiti}</span>
+        </div>`
+      }).join('')
+      document.getElementById('pendingWarn').classList.add('show')
+    }
+  }
+
+  // ── CATEGORY PILLS ──
+  function buildCatPills() {
+    const cats = ['__ALL__', ...[...new Set(barangAll.map(b => b.kategori || 'Lain-lain'))].sort()]
+    document.getElementById('catPills').innerHTML = cats.map(c => {
+      const label = c === '__ALL__' ? '🗂 Semua' : c
+      return `<button class="cat-pill${c === selectedCat ? ' active' : ''}"
+        onclick="setCat('${c.replace(/'/g,"\\'")}')">
+        ${label}
+      </button>`
+    }).join('')
+  }
+
+  window.setCat = function(cat) {
+    selectedCat = cat
+    buildCatPills()
+    renderBarangList()
+    selectedBarang = null
+    document.getElementById('qtyStrip').classList.remove('show')
+  }
+
+  // ── RENDER BARANG LIST ──
+  window.renderBarangList = function() {
+    const q = document.getElementById('searchBox').value.toLowerCase()
+    const filtered = barangAll.filter(x => {
+      const matchCat = selectedCat === '__ALL__' || (x.kategori || 'Lain-lain') === selectedCat
+      const matchQ   = !q || x.nama.toLowerCase().includes(q) || (x.kategori || '').toLowerCase().includes(q)
+      return matchCat && matchQ
+    })
+
+    const el = document.getElementById('barangList')
+
+    if (!filtered.length) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3);font-size:12px;font-weight:600;">Tiada barang dijumpai</div>'
+      return
+    }
+
+    el.innerHTML = filtered.map(x => {
+      const habis  = x.baki <= 0
+      const low    = x.baki > 0 && x.baki <= 5
+      const bClass = habis ? 'habis' : low ? 'low' : ''
+      const bLabel = habis ? 'Habis' : `${x.baki} unit`
+      return `<div class="barang-item${habis ? ' disabled' : ''}" onclick="${habis ? '' : `selectBarang(${x.id})`}">
+        <div>
+          <div class="barang-item-name">${x.nama}</div>
+          <div class="barang-item-cat">${x.kategori || 'Lain-lain'}</div>
+        </div>
+        <span class="barang-baki ${bClass}">${bLabel}</span>
+      </div>`
+    }).join('')
+  }
+
+  // ── SELECT BARANG ──
+  window.selectBarang = function(id) {
+    const item = barangAll.find(x => x.id === id)
+    if (!item || item.baki <= 0) return
+
+    selectedBarang = item
+    currentQty     = 1
+
+    document.getElementById('qsName').textContent = item.nama
+    document.getElementById('qsBaki').textContent = `Baki: ${item.baki} unit`
+    document.getElementById('qtyVal').textContent  = '1'
+    document.getElementById('qtyStrip').classList.add('show')
+
+    document.querySelectorAll('.barang-item').forEach(el => el.classList.remove('sel'))
+    document.querySelectorAll('.barang-item').forEach(el => {
+      if (el.querySelector('.barang-item-name')?.textContent === item.nama) el.classList.add('sel')
+    })
+  }
+
+  // ── QTY ──
+  window.changeQty = function(d) {
+    if (!selectedBarang) return
+    currentQty = Math.max(1, Math.min(selectedBarang.baki, currentQty + d))
+    document.getElementById('qtyVal').textContent = currentQty
+  }
+
+  // ── ADD TO CART ──
+  window.addToCart = function() {
+    if (!selectedBarang) return
+
+    // Kalau barang dah dalam cart, tambah quantity
+    const exist = cart.find(x => x.barang_id === selectedBarang.id)
+    if (exist) {
+      exist.kuantiti = Math.min(selectedBarang.baki, exist.kuantiti + currentQty)
+    } else {
+      cart.push({ nama: selectedBarang.nama, kuantiti: currentQty, barang_id: selectedBarang.id })
+    }
+
+    selectedBarang = null
+    document.getElementById('qtyStrip').classList.remove('show')
+    document.querySelectorAll('.barang-item').forEach(el => el.classList.remove('sel'))
+    renderCart()
+  }
+
+  // ── RENDER CART ──
+  function renderCart() {
+    const c = document.getElementById('cartContainer')
+    if (!cart.length) {
+      c.innerHTML = '<div class="cart-empty">📭 Belum ada barang dipilih</div>'
+      return
+    }
+    c.innerHTML = cart.map((item, i) => `
+      <div class="cart-item">
+        <div class="cart-item-name">${item.nama}</div>
+        <span class="cart-item-qty">×${item.kuantiti}</span>
+        <button class="cart-del" onclick="removeCart(${i})">✕</button>
+      </div>
+    `).join('')
+  }
+
+  window.removeCart = function(i) {
+    cart.splice(i, 1)
+    renderCart()
+  }
+
+  // ── AUTOFILL ──
+  function loadSavedProfile(defaultNama, defaultEmail, defaultBahagian) {
+    try {
+      const saved    = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null')
+      const nama     = saved?.nama     || defaultNama     || ''
+      const emel     = saved?.emel     || defaultEmail    || ''
+      const bahagian = saved?.bahagian || defaultBahagian || ''
+
+      document.getElementById('nama').value  = nama
+      document.getElementById('emel').value  = emel
+      if (bahagian) {
+        const sel = document.getElementById('bahagian')
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === bahagian) { sel.selectedIndex = i; break }
+        }
+      }
+      if (nama) {
+        document.getElementById('autofillName').textContent = nama
+        document.getElementById('autofillBar').classList.add('show')
+      }
+    } catch(e) {}
+  }
+
+  window.clearProfile = function() {
+    localStorage.removeItem(PROFILE_KEY)
+    document.getElementById('nama').value = ''
+    document.getElementById('emel').value = ''
+    document.getElementById('bahagian').selectedIndex = 0
+    document.getElementById('autofillBar').classList.remove('show')
+    document.getElementById('nama').focus()
+  }
+
+  function saveProfile() {
+    const nama     = document.getElementById('nama').value.trim()
+    const emel     = document.getElementById('emel').value.trim()
+    const bahagian = document.getElementById('bahagian').value
+    if (!nama || !emel) return
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ nama, emel, bahagian })) } catch(e) {}
+  }
+
+  // ── HANTAR ──
+  window.hantar = function() {
+    const nama     = document.getElementById('nama').value.trim()
+    const emel     = document.getElementById('emel').value.trim()
+    const bahagian = document.getElementById('bahagian').value
+
+    if (!nama || !emel || !bahagian) { showAlert('Sila lengkapkan maklumat pemohon.', 'error'); return }
+    if (!cart.length)                 { showAlert('Sila pilih sekurang-kurangnya satu barang.', 'error'); return }
+
+    // Ada pending? Tunjuk modal konfirmasi dulu
+    if (hasPending) {
+      document.getElementById('confirmModal').classList.add('open')
+      return
+    }
+
+    doSubmit()
+  }
+
+  window.closeModal = function() {
+    document.getElementById('confirmModal').classList.remove('open')
+  }
+
+  window.confirmSubmit = function() {
+    closeModal()
+    doSubmit()
+  }
+
+  async function doSubmit() {
+    const nama     = document.getElementById('nama').value.trim()
+    const emel     = document.getElementById('emel').value.trim()
+    const bahagian = document.getElementById('bahagian').value
+
+    const btn = document.getElementById('submitBtn')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span> Menghantar...'
+
+    // Insert satu rekod per barang dalam cart
+    const inserts = cart.map(item => ({
+      user_id:     userSession.user.id,
+      nama,
+      bahagian,
+      nama_barang: item.nama,
+      kuantiti:    item.kuantiti,
+      tujuan:      'Keperluan pejabat',
+      status:      'MENUNGGU'
+    }))
+
+    const { error } = await supabase
+      .from('permohonan_stok')
+      .insert(inserts)
+
+    btn.disabled = false
+    btn.innerHTML = '📨 Hantar Permohonan'
+
+    if (error) { showAlert('❌ Ralat sistem: ' + error.message, 'error'); return }
+
+    saveProfile()
+    showAlert(`✅ Permohonan berjaya dihantar! ${cart.length} item — Status: MENUNGGU KELULUSAN.`, 'success')
+
+    // Reset cart
+    cart = []
+    renderCart()
+
+    // Refresh pending warning
+    await checkPending()
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('alertMsg')
+    el.textContent = msg
+    el.className = 'alert ' + type
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    setTimeout(() => { el.className = 'alert' }, 7000)
+  }
+
+  init()
+</script>
+
+</body>
+</html>
