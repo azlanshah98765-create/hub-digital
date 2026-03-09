@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUB DIGITAL BPS</title>
+  <title>HUB DIGITAL BPS — Yayasan Waqaf Malaysia</title>
 
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="logo-bps.png">
@@ -11,284 +11,693 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Hub BPS">
-  <meta name="application-name" content="Hub BPS">
-  <meta name="theme-color" content="#1a237e">
+  <meta name="theme-color" content="#040c18">
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg:        #040c18;
+      --surface:   #07111f;
+      --surface-2: #0b1a2e;
+      --border:    rgba(255,255,255,0.06);
+      --border-hi: rgba(255,255,255,0.12);
+      --blue:      #2563eb;
+      --blue-glow: rgba(37,99,235,0.35);
+      --blue-mid:  #3b82f6;
+      --teal:      #0d9488;
+      --teal-soft: rgba(13,148,136,0.15);
+      --gold:      #ca8a04;
+      --gold-soft: rgba(202,138,4,0.12);
+      --text:      #f0f4ff;
+      --text-2:    #94a3b8;
+      --text-3:    #475569;
+      --mono:      'JetBrains Mono', monospace;
+    }
 
-    body {
-      background: #1a237e;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-      min-height: 100vh;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ─── CANVAS BACKGROUND ─── */
+    canvas#bgCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .bg-radial {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(37,99,235,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(13,148,136,0.08) 0%, transparent 60%);
+    }
+
+    /* ─── LAYOUT ─── */
+    .page {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 30px 20px;
+      padding: 24px 20px;
+      overflow-y: auto;
     }
 
-    /* LOADING SCREEN */
+    /* ─── LOADING ─── */
     #loadingScreen {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 16px;
+      gap: 24px;
     }
 
-    #loadingScreen img {
-      width: 90px;
-      animation: pulse 1.5s infinite;
+    .spinner-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
     }
 
-    #loadingScreen p {
-      font-size: 16px;
-      font-weight: 600;
-      opacity: 0.9;
+    .spinner-wrap img {
+      position: absolute;
+      inset: 12px;
+      border-radius: 14px;
+      object-fit: contain;
+      z-index: 2;
     }
 
-    #loadingScreen span {
-      font-size: 13px;
-      opacity: 0.6;
+    .spinner-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      border: 1.5px solid transparent;
+      background:
+        linear-gradient(var(--bg), var(--bg)) padding-box,
+        conic-gradient(from 0deg, var(--blue) 0%, var(--teal) 40%, transparent 60%) border-box;
+      animation: rotate 1.8s linear infinite;
     }
 
-    /* INSTALL SCREEN */
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+
+    .progress-bar {
+      width: 160px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+      border-radius: 99px;
+      animation: load 1.6s ease-out forwards;
+    }
+
+    @keyframes load {
+      0%   { width: 0%; }
+      60%  { width: 75%; }
+      100% { width: 100%; }
+    }
+
+    /* ─── INSTALL SCREEN ─── */
     #installScreen {
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
-      max-width: 360px;
       width: 100%;
-    }
-
-    .install-logo {
-      width: 80px;
-      border-radius: 20px;
-    }
-
-    .install-title {
-      font-size: 22px;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .install-subtitle {
-      font-size: 13px;
-      opacity: 0.7;
-      text-align: center;
-      margin-top: -16px;
-    }
-
-    .steps {
-      background: rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 20px;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
+      max-width: 420px;
       gap: 16px;
     }
 
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    /* Staggered entrance */
+    #installScreen > * {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: slideIn .45s ease forwards;
+    }
+    #installScreen > *:nth-child(1) { animation-delay: .05s; }
+    #installScreen > *:nth-child(2) { animation-delay: .15s; }
+    #installScreen > *:nth-child(3) { animation-delay: .25s; }
+    #installScreen > *:nth-child(4) { animation-delay: .30s; }
+    #installScreen > *:nth-child(5) { animation-delay: .35s; }
+
+    @keyframes slideIn {
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .step-num {
-      background: #3b82f6;
-      width: 32px;
-      height: 32px;
+    /* ─── IDENTITY BLOCK ─── */
+    .identity {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border-hi);
+      border-radius: 20px;
+      padding: 20px 20px 20px 20px;
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .identity::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(37,99,235,0.6) 30%,
+        rgba(13,148,136,0.6) 70%,
+        transparent 100%);
+    }
+
+    .id-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      object-fit: contain;
+      background: rgba(37,99,235,0.08);
+      border: 1px solid rgba(37,99,235,0.18);
+      padding: 8px;
+    }
+
+    .id-text {}
+
+    .id-org {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 3px;
+    }
+
+    .id-name {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    .id-sub {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 3px;
+      font-weight: 400;
+    }
+
+    .id-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 500;
+      background: var(--teal-soft);
+      border: 1px solid rgba(13,148,136,0.3);
+      color: #2dd4bf;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 5px; height: 5px;
       border-radius: 50%;
+      background: #2dd4bf;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .version-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-3);
+      letter-spacing: 1px;
+    }
+
+    /* ─── DIVIDER LABEL ─── */
+    .section-label {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label span {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── STEPS CARD ─── */
+    .steps-card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      transition: background .2s;
+    }
+
+    .step-item:last-child { border-bottom: none; }
+    .step-item:hover { background: rgba(255,255,255,0.02); }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--blue-mid);
+      background: rgba(37,99,235,0.1);
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 14px;
       flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-body {
+      flex: 1;
+      padding-top: 4px;
     }
 
     .step-text {
-      font-size: 14px;
-      line-height: 1.5;
-      opacity: 0.9;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-2);
+      line-height: 1.6;
     }
 
-    .step-text b { color: #93c5fd; }
+    .step-text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
 
-    #androidBtn {
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 7px;
+      background: rgba(37,99,235,0.1);
+      border: 1px solid rgba(37,99,235,0.25);
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--blue-mid);
+      font-weight: 500;
+      margin: 0 1px;
+      vertical-align: middle;
+    }
+
+    /* ─── BUTTON ─── */
+    #installBtn {
       display: none;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 99px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
       width: 100%;
-      max-width: 360px;
-      transition: 0.2s;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: var(--blue);
+      color: white;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 24px var(--blue-glow), inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
-    #androidBtn:active { transform: scale(0.97); }
+    #installBtn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+      border-radius: inherit;
+    }
 
-    .arrow-indicator {
-      display: flex;
+    #installBtn:hover {
+      background: #1d4ed8;
+      box-shadow: 0 6px 32px rgba(37,99,235,0.5);
+      transform: translateY(-1px);
+    }
+
+    #installBtn:active {
+      transform: scale(0.985);
+    }
+
+    /* ─── iOS ARROW ─── */
+    #iosArrow {
+      display: none;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      opacity: 0.7;
-      font-size: 12px;
+      gap: 8px;
+      padding: 8px 0;
     }
 
-    .arrow-bounce {
-      font-size: 28px;
-      animation: bounce 1s infinite;
+    .ios-hint {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
     }
 
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+    .ios-chevron {
+      color: var(--blue-mid);
+      font-size: 20px;
+      animation: nudge 1.4s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(0.95); opacity: 0.7; }
-      50% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(0.95); opacity: 0.7; }
+    @keyframes nudge {
+      0%, 100% { transform: translateY(0); opacity: 0.5; }
+      50%       { transform: translateY(5px); opacity: 1; }
     }
 
-    .share-icon {
+    /* ─── FOOTER ─── */
+    .footer-line {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      text-align: center;
+    }
+
+    /* ─── SHARE ICON ─── */
+    .share-svg {
       display: inline-block;
-      width: 18px;
-      height: 18px;
+      width: 14px; height: 14px;
       vertical-align: middle;
-      margin: 0 2px;
+      margin: 0 1px -1px 1px;
+    }
+
+    /* scroll on small phones */
+    @media (max-height: 680px) {
+      .page { justify-content: flex-start; padding-top: 28px; }
     }
   </style>
 </head>
 <body>
 
+<canvas id="bgCanvas"></canvas>
+<div class="bg-radial"></div>
+
+<div class="page">
+
   <!-- LOADING -->
   <div id="loadingScreen">
-    <img src="logo-bps.png" alt="Logo BPS">
-    <p>HUB DIGITAL BPS</p>
-    <span>Memuatkan...</span>
+    <div class="spinner-wrap">
+      <div class="spinner-ring"></div>
+      <img src="logo-bps.png" alt="BPS">
+    </div>
+    <div class="loading-label">Memuatkan sistem</div>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
   </div>
 
-  <!-- INSTALL INSTRUCTIONS -->
+  <!-- INSTALL -->
   <div id="installScreen">
-    <img src="logo-bps.png" alt="Logo BPS" class="install-logo">
-    <div class="install-title">Pasang Aplikasi</div>
-    <div class="install-subtitle">Pasang untuk akses lebih pantas</div>
+
+    <!-- Identity -->
+    <div class="identity">
+      <img src="logo-bps.png" alt="BPS" class="id-logo">
+      <div class="id-text">
+        <div class="id-org">Yayasan Waqaf Malaysia</div>
+        <div class="id-name">Hub Digital<br>BPS</div>
+        <div class="id-sub">Bahagian Pengurusan</div>
+      </div>
+      <div class="id-status">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Aktif
+        </div>
+        <div class="version-tag">v2.0</div>
+      </div>
+    </div>
+
+    <!-- Section label -->
+    <div class="section-label" id="sectionLabel">
+      <span>Arahan Pemasangan</span>
+    </div>
 
     <!-- iOS Steps -->
-    <div class="steps" id="iosSteps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Tap butang <b>Share</b>
-          <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
-          </svg>
-          di bawah browser</div>
+    <div class="steps-card" id="iosSteps" style="display:none">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-text">Tap ikon <strong>Share</strong>
+            <svg class="share-svg" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2.5">
+              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/>
+            </svg>
+            di bar bawah Safari
+          </div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Scroll ke bawah, pilih <b>"Add to Home Screen"</b></div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-text">Scroll ke bawah, pilih <span class="chip">Add to Home Screen</span></div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Tap <b>"Add"</b> di penjuru kanan atas</div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-text">Tap <strong>Add</strong> di penjuru kanan atas untuk selesai</div>
+        </div>
       </div>
     </div>
 
     <!-- Android Steps -->
-    <div class="steps" id="androidSteps" style="display:none;">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Tap butang <b>"Pasang"</b> di bawah ini</div>
+    <div class="steps-card" id="androidSteps" style="display:none">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-text">Tap butang <strong>Pasang Aplikasi</strong> di bawah</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Tap <b>"Install"</b> pada popup yang keluar</div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-text">Tap <span class="chip">Install</span> pada popup yang muncul</div>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">App akan tersimpan di <b>Home Screen</b> korang</div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-text">App akan tersimpan di <strong>Home Screen</strong> peranti anda</div>
+        </div>
       </div>
     </div>
 
-    <button id="androidBtn" onclick="triggerInstall()">
-      📲 Pasang Aplikasi
-    </button>
-
-    <div class="arrow-indicator" id="iosArrow">
-      <span>Tap butang Share di bawah</span>
-      <div class="arrow-bounce">↓</div>
+    <!-- PC Steps -->
+    <div class="steps-card" id="pcSteps" style="display:none">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-text">Klik butang <strong>Pasang ke Desktop</strong> di bawah</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-text">Klik <span class="chip">Install</span> pada popup yang muncul</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-text">App akan tersimpan di <strong>Desktop</strong> atau <strong>Taskbar</strong> anda</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Install Button -->
+    <button id="installBtn" onclick="triggerInstall()">Pasang Aplikasi</button>
+
+    <!-- iOS Arrow -->
+    <div id="iosArrow">
+      <div class="ios-hint">Tap Share di bawah</div>
+      <div class="ios-chevron">↓</div>
+    </div>
+
+    <div class="footer-line">Hub Digital BPS &nbsp;·&nbsp; YWM &nbsp;·&nbsp; 2026</div>
 
   </div>
 
-  <script>
-    const APP_URL = "https://script.google.com/macros/s/AKfycbxAayNzE48J_moSpnKJCdg4qEC8uvq2vLoFqM7TytdF67hkFOEsme4i4CItiAOLbtlYYA/exec";
+</div>
 
-    let deferredPrompt = null;
+<!-- SUBTLE ANIMATED GRID DOTS -->
+<script>
+(function () {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, dots = [];
 
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true;
-
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-    });
-
-    window.onload = function () {
-      if (isStandalone) {
-        redirectToApp();
-      } else {
-        setTimeout(showInstallScreen, 1500);
-      }
-    };
-
-    function redirectToApp() {
-      window.location.replace(APP_URL);
-    }
-
-    function showInstallScreen() {
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('installScreen').style.display = 'flex';
-
-      if (isIOS) {
-        document.getElementById('iosSteps').style.display = 'flex';
-        document.getElementById('iosArrow').style.display = 'flex';
-        document.getElementById('androidSteps').style.display = 'none';
-      } else {
-        document.getElementById('androidSteps').style.display = 'flex';
-        document.getElementById('iosSteps').style.display = 'none';
-        document.getElementById('iosArrow').style.display = 'none';
-        document.getElementById('androidBtn').style.display = 'block';
-      }
-    }
-
-    function triggerInstall() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((result) => {
-          if (result.outcome === 'accepted') {
-            redirectToApp();
-          }
-          deferredPrompt = null;
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    dots = [];
+    const cols = Math.ceil(W / 56);
+    const rows = Math.ceil(H / 56);
+    for (let r = 0; r <= rows; r++) {
+      for (let c = 0; c <= cols; c++) {
+        dots.push({
+          x: c * 56, y: r * 56,
+          o: Math.random() * 0.3,
+          s: Math.random() * 0.8 + 0.2,
+          d: Math.random() * Math.PI * 2
         });
-      } else {
-        alert('Tap ⋮ (3 titik) → "Add to Home Screen" untuk pasang app ini.');
       }
     }
-  </script>
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    dots.forEach(d => {
+      const o = d.o + Math.sin(t * 0.0008 + d.d) * 0.12;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.s, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(59,130,246,${Math.max(0, o)})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
+</script>
+
+<!-- PWA LOGIC -->
+<script>
+  const APP_URL = "https://script.google.com/macros/s/AKfycby3xoEKW11SGNL_sHdQ8dQrFqMOIbOvP7lbg31pp1XxHlqL7h-DzvRik6oA6zJgVkbC8A/exec";
+
+  let deferredPrompt = null;
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  const isIOS    = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isPC     = !isMobile;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+
+  window.onload = function () {
+    if (isStandalone) {
+      redirectToApp();
+    } else {
+      setTimeout(showInstall, 1800);
+    }
+  };
+
+  function redirectToApp() {
+    window.location.replace(APP_URL);
+  }
+
+  function showInstall() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    const screen = document.getElementById('installScreen');
+    screen.style.display = 'flex';
+
+    const lbl = document.getElementById('sectionLabel').querySelector('span');
+    const btn = document.getElementById('installBtn');
+
+    if (isIOS) {
+      lbl.textContent = 'Arahan Pemasangan — iOS';
+      document.getElementById('iosSteps').style.display = 'block';
+      document.getElementById('iosArrow').style.display = 'flex';
+    } else if (isPC) {
+      lbl.textContent = 'Arahan Pemasangan — Desktop';
+      document.getElementById('pcSteps').style.display = 'block';
+      btn.style.display = 'block';
+      btn.textContent = '🖥  Pasang ke Desktop';
+    } else {
+      lbl.textContent = 'Arahan Pemasangan — Android';
+      document.getElementById('androidSteps').style.display = 'block';
+      btn.style.display = 'block';
+      btn.textContent = '📲  Pasang Aplikasi';
+    }
+  }
+
+  function triggerInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((r) => {
+        if (r.outcome === 'accepted') redirectToApp();
+        deferredPrompt = null;
+      });
+    } else {
+      alert('Tap ⋮ → "Add to Home Screen" untuk pasang app ini.');
+    }
+  }
+</script>
 
 </body>
 </html>
