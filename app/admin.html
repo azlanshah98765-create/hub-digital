@@ -1647,19 +1647,83 @@ window.showKDrvDetail = function(driverName, tarikhMula, tarikhTamat, masa) {
   openModal('kDrvDetailModal');
 };
 
+// ── GOOGLE CALENDAR SYNC ──────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3xoEKW11SGNL_sHdQ8dQrFqMOIbOvP7lbg31pp1XxHlqL7h-DzvRik6oA6zJgVkbC8A/exec';
+
+async function syncToGoogleCalendar(payload) {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'calendar_sync', ...payload })
+    });
+    const data = await res.json();
+    if (data.eventId) {
+      // Save eventId back to Supabase
+      const table = payload.modul === 'kenderaan' ? 'tempahan_kenderaan' : 'tempahan_bilik';
+      await sb.from(table).update({ gcal_event_id: data.eventId }).eq('id', payload.supabaseId);
+    }
+    return data;
+  } catch (e) {
+    console.warn('Google Calendar sync gagal (non-critical):', e.message);
+    return { success: false };
+  }
+}
+
+async function deleteFromGoogleCalendar(modul, calendarName, eventId) {
+  if (!eventId) return;
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'calendar_sync',
+        modul, action: 'delete', calendarName, eventId
+      })
+    });
+  } catch (e) {
+    console.warn('Calendar delete gagal:', e.message);
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
 window.confirmKApprove = async function() {
   if (!kCurrentApproveItem || !kSelectedDriver) return;
   const btn = document.getElementById('kApproveConfirmBtn');
   btn.disabled = true; btn.textContent = '⏳ Memproses...';
 
+  const item = kCurrentApproveItem;
+
   const { error } = await sb.from('tempahan_kenderaan').update({
     status: 'DISAHKAN', pemandu: kSelectedDriver
-  }).eq('id', kCurrentApproveItem.id);
+  }).eq('id', item.id);
+
+  if (error) {
+    btn.disabled = false; btn.textContent = '✅ Lulus Sekarang';
+    closeModal('kApproveModal');
+    showToast('❌ ' + error.message, 'error'); return;
+  }
+
+  // Sync ke Google Calendar (background, non-blocking)
+  syncToGoogleCalendar({
+    modul: 'kenderaan',
+    action: 'create',
+    calendarName: item.kenderaan,
+    title: item.nama_pemohon || item.pemohon || 'Tempahan',
+    startDateTime: item.tarikh_mula,
+    endDateTime: item.tarikh_tamat,
+    pemohon: item.nama_pemohon || item.pemohon || '-',
+    bahagian: item.bahagian || '-',
+    destinasi: item.destinasi || '-',
+    tujuan: item.tujuan || '-',
+    penumpang: item.penumpang || '-',
+    pemandu: kSelectedDriver,
+    supabaseId: item.id
+  });
 
   btn.disabled = false; btn.textContent = '✅ Lulus Sekarang';
   closeModal('kApproveModal');
-  if (error) { showToast('❌ ' + error.message, 'error'); return; }
-  showToast('✅ Permohonan diluluskan!', 'success');
+  showToast('✅ Permohonan diluluskan! Sync ke Google Calendar...', 'success');
   loadKenderaanData();
 };
 
@@ -1708,9 +1772,20 @@ window.selKBatalSebab = function(el, sebab) {
 window.confirmKBatal = async function() {
   const nota = document.getElementById('kBatalNota').value.trim();
   const sebab = kSelectedBatalSebab + (nota ? ' — ' + nota : '');
+
+  // Get item data first for calendar delete
+  const item = kHistory.find(i => i.id === kCurrentBatalRow) ||
+               kPending.find(i => i.id === kCurrentBatalRow);
+
   const { error } = await sb.from('tempahan_kenderaan').update({ status: 'DIBATALKAN', sebab_tolak: sebab }).eq('id', kCurrentBatalRow);
   closeModal('kBatalModal');
   if (error) { showToast('❌ ' + error.message, 'error'); return; }
+
+  // Delete from Google Calendar if event exists
+  if (item?.gcal_event_id) {
+    deleteFromGoogleCalendar('kenderaan', item.kenderaan, item.gcal_event_id);
+  }
+
   showToast('🚫 Tempahan dibatalkan', 'info');
   loadKenderaanData();
 };
