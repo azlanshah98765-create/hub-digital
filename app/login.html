@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Masuk — Hub Digital BPS</title>
+  <meta name="theme-color" content="#040c18">
+
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:       #040c18;
+      --surface:  #07111f;
+      --border:   rgba(255,255,255,0.07);
+      --border-hi:rgba(255,255,255,0.13);
+      --blue:     #2563eb;
+      --blue-mid: #3b82f6;
+      --blue-glow:rgba(37,99,235,0.3);
+      --teal:     #0d9488;
+      --text:     #f0f4ff;
+      --text-2:   #94a3b8;
+      --text-3:   #475569;
+      --error:    #f87171;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 10%, rgba(37,99,235,0.13) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 85% 90%, rgba(13,148,136,0.09) 0%, transparent 60%);
+    }
+
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px);
+      background-size: 52px 52px;
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative; z-index: 1;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 64px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(37,99,235,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .brand-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-tag::before {
+      content: '';
+      width: 24px; height: 1px;
+      background: var(--teal);
+    }
+
+    .brand-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      margin-bottom: 28px;
+    }
+
+    .brand-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .brand-title span {
+      background: linear-gradient(135deg, var(--blue-mid), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-desc {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.7;
+      max-width: 340px;
+      margin-bottom: 48px;
+    }
+
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    .feature-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--blue-mid);
+      flex-shrink: 0;
+    }
+
+    .left-footer {
+      position: absolute;
+      bottom: 32px; left: 64px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-3);
+      letter-spacing: 1.5px;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 64px;
+    }
+
+    .form-wrap {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .form-header {
+      margin-bottom: 36px;
+    }
+
+    .form-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .form-sub {
+      font-size: 13px;
+      color: var(--text-3);
+    }
+
+    /* ── TABS ── */
+    .auth-tabs {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-3);
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .auth-tab.active {
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 2px 12px var(--blue-glow);
+    }
+
+    /* ── FORM ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .form-input::placeholder { color: var(--text-3); }
+
+    .form-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    .form-input.error {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.12);
+    }
+
+    /* Register extra fields */
+    #registerFields { display: none; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+    }
+
+    .form-select:focus { border-color: var(--blue); }
+    .form-select option { background: #07111f; }
+
+    /* ── SUBMIT BUTTON ── */
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      background: var(--blue);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px var(--blue-glow);
+    }
+
+    .submit-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(37,99,235,0.45);
+    }
+
+    .submit-btn:active { transform: scale(0.98); }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── ALERT ── */
+    .alert {
+      display: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .alert.error {
+      display: block;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.25);
+      color: var(--error);
+    }
+
+    .alert.success {
+      display: block;
+      background: rgba(13,148,136,0.1);
+      border: 1px solid rgba(13,148,136,0.25);
+      color: #2dd4bf;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--text-3);
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      html, body { overflow-y: auto; }
+      .page { grid-template-columns: 1fr; height: auto; min-height: 100vh; }
+      .left-panel { display: none; }
+      .right-panel { padding: 48px 24px; min-height: 100vh; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+
+  <!-- ── LEFT ── -->
+  <div class="left-panel">
+    <div class="brand-tag">Yayasan Waqaf Malaysia</div>
+    <img src="../Untitled_design-removebg-preview.png" alt="BPS" class="brand-logo">
+    <div class="brand-title">Hub Digital<br><span>BPS</span></div>
+    <div class="brand-desc">Sistem pengurusan dalaman Bahagian Pengurusan Sokongan — tempahan kenderaan, bilik, aset dan stok dalam satu platform.</div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-dot"></div>
+        Tempahan Kenderaan & Bilik
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:var(--teal)"></div>
+        Permohonan Aset & Stok
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#a78bfa"></div>
+        Notifikasi & Status Permohonan
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#f59e0b"></div>
+        Panel Admin & Laporan
+      </div>
+    </div>
+
+    <div class="left-footer">HUB DIGITAL BPS &nbsp;·&nbsp; YWM &nbsp;·&nbsp; v3.0</div>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="right-panel">
+    <div class="form-wrap">
+
+      <div class="form-header">
+        <div class="form-title">Selamat Datang</div>
+        <div class="form-sub">Log masuk untuk akses sistem</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Log Masuk</button>
+        <button class="auth-tab" onclick="switchTab('register')">Daftar Akaun</button>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="alertBox"></div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label">Emel</label>
+        <input type="email" class="form-input" id="email" placeholder="nama@ywm.gov.my">
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label class="form-label">Kata Laluan</label>
+        <input type="password" class="form-input" id="password" placeholder="••••••••">
+      </div>
+
+      <!-- Register fields -->
+      <div id="registerFields">
+        <div class="divider">maklumat tambahan</div>
+
+        <div class="form-group">
+          <label class="form-label">Nama Penuh</label>
+          <input type="text" class="form-input" id="nama" placeholder="Nama seperti dalam kad pengenalan">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Bahagian</label>
+            <select class="form-select" id="bahagian">
+              <option value="">Pilih</option>
+              <option>BPS</option>
+              <option>Kewangan</option>
+              <option>Pengurusan Hartanah</option>
+              <option>Wakaf Korporat</option>
+              <option>Pembangunan</option>
+              <option>Pengurusan Risiko</option>
+              <option>Teknologi Maklumat</option>
+              <option>Perundangan</option>
+              <option>Komunikasi</option>
+              <option>CEO Office</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jawatan</label>
+            <input type="text" class="form-input" id="jawatan" placeholder="Contoh: Pegawai">
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+        Log Masuk
+      </button>
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { supabase, redirectIfAuth } from './js/supabase.js'
+
+  // Redirect if already logged in
+  redirectIfAuth()
+
+  let currentTab = 'login'
+
+  window.switchTab = function(tab) {
+    currentTab = tab
+    document.querySelectorAll('.auth-tab').forEach((t, i) => {
+      t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1))
+    })
+    document.getElementById('registerFields').style.display = tab === 'register' ? 'block' : 'none'
+    document.getElementById('submitBtn').textContent = tab === 'login' ? 'Log Masuk' : 'Daftar Akaun'
+    hideAlert()
+  }
+
+  window.handleSubmit = async function() {
+    const email    = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value
+
+    if (!email || !password) return showAlert('Sila isi emel dan kata laluan.', 'error')
+
+    const btn = document.getElementById('submitBtn')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span> Memproses...'
+
+    try {
+      if (currentTab === 'login') {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+        showAlert('Berjaya log masuk! Menghala...', 'success')
+        setTimeout(() => { window.location.href = '/app/hub.html' }, 800)
+
+      } else {
+        const nama     = document.getElementById('nama').value.trim()
+        const bahagian = document.getElementById('bahagian').value
+        const jawatan  = document.getElementById('jawatan').value.trim()
+
+        if (!nama || !bahagian || !jawatan) throw new Error('Sila lengkapkan semua maklumat.')
+
+        const { data, error } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { nama, bahagian, jawatan } }
+        })
+        if (error) throw error
+
+        // Update profile
+        if (data.user) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id, email, nama, bahagian, jawatan
+          })
+        }
+
+        showAlert('Akaun berjaya didaftarkan! Sila log masuk.', 'success')
+        setTimeout(() => switchTab('login'), 1500)
+      }
+    } catch (err) {
+      let msg = err.message
+      if (msg.includes('Invalid login')) msg = 'Emel atau kata laluan tidak betul.'
+      if (msg.includes('already registered')) msg = 'Emel ini sudah didaftarkan.'
+      if (msg.includes('Password should')) msg = 'Kata laluan mesti sekurang-kurangnya 6 aksara.'
+      showAlert(msg, 'error')
+    } finally {
+      btn.disabled = false
+      btn.textContent = currentTab === 'login' ? 'Log Masuk' : 'Daftar Akaun'
+    }
+  }
+
+  // Enter key submit
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.handleSubmit()
+  })
+
+  function showAlert(msg, type) {
+    const box = document.getElementById('alertBox')
+    box.textContent = msg
+    box.className = `alert ${type}`
+  }
+
+  function hideAlert() {
+    document.getElementById('alertBox').className = 'alert'
+  }
+</script>
+
+</body>
+</html>
