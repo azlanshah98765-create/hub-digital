@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tempahan Kenderaan — Hub Digital BPS</title>
+  <meta name="theme-color" content="#040c18">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:       #040c18;
+      --surface:  #07111f;
+      --surface-2:#0b1a2e;
+      --border:   rgba(255,255,255,0.07);
+      --border-hi:rgba(255,255,255,0.13);
+      --blue:     #2563eb;
+      --blue-mid: #3b82f6;
+      --blue-glow:rgba(37,99,235,0.25);
+      --teal:     #0d9488;
+      --green:    #059669;
+      --text:     #f0f4ff;
+      --text-2:   #94a3b8;
+      --text-3:   #475569;
+      --error:    #f87171;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* BG */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(37,99,235,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 90% 100%, rgba(13,148,136,0.07) 0%, transparent 60%);
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+      background-size: 52px 52px;
+    }
+
+    /* HEADER */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(4,12,24,0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hdr-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: var(--text-3);
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .back-btn:hover { border-color: var(--border-hi); color: var(--text); }
+
+    .hdr-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .hdr-title span {
+      background: linear-gradient(135deg, var(--blue-mid), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 12px 5px 5px;
+    }
+    .user-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: white;
+    }
+    .user-name-chip { font-size: 12px; font-weight: 600; }
+
+    /* MAIN */
+    main {
+      position: relative; z-index: 1;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* PAGE TITLE */
+    .page-banner {
+      background: linear-gradient(135deg, #0f1f3d 0%, #0a1628 60%, #051828 100%);
+      border: 1px solid var(--border-hi);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .page-banner::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(13,148,136,0.5), transparent);
+    }
+    .page-banner::after {
+      content: '🚗';
+      position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+      font-size: 64px; opacity: 0.07;
+    }
+    .banner-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .banner-sub { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+
+    .vehicle-pills {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px;
+    }
+    .vehicle-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px;
+      background: rgba(37,99,235,0.1);
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--blue-mid);
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .vehicle-pill:hover, .vehicle-pill.active {
+      background: rgba(37,99,235,0.2);
+      border-color: rgba(37,99,235,0.4);
+      color: var(--text);
+    }
+    .vehicle-pill.active { font-weight: 700; }
+
+    /* SECTION LABEL */
+    .slbl {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin: 24px 0 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .slbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* FORM CARD */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    /* AUTOFILL BANNER */
+    .autofill-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13,148,136,0.08);
+      border: 1px solid rgba(13,148,136,0.2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #2dd4bf;
+      font-weight: 600;
+    }
+    .autofill-bar.show { display: flex; }
+    .autofill-clear {
+      background: transparent; border: 1px solid rgba(13,148,136,0.25);
+      border-radius: 6px; padding: 3px 10px;
+      color: var(--text-3); font-size: 11px; cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      transition: all .2s;
+    }
+    .autofill-clear:hover { color: var(--text); border-color: var(--border-hi); }
+
+    /* FORM ELEMENTS */
+    .form-label {
+      display: block;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 7px;
+      margin-top: 16px;
+    }
+    .form-label:first-child { margin-top: 0; }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-3); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .form-select { appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .form-select option { background: #07111f; }
+
+    .form-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .form-col { flex: 1; min-width: 180px; }
+    .form-col-sm { flex: 0 0 150px; }
+
+    /* CHECKBOX */
+    .check-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .check-row input[type="checkbox"] { width: auto; accent-color: var(--blue); }
+    .check-row label { font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; margin: 0; }
+
+    /* SLOT SECTION */
+    .semak-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px;
+      background: var(--blue);
+      border: none; border-radius: 10px;
+      color: white; font-family: 'Sora', sans-serif;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 16px var(--blue-glow);
+      white-space: nowrap;
+    }
+    .semak-btn:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    .day-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 14px;
+    }
+    .day-block h4 {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--blue-mid);
+      margin-bottom: 14px;
+    }
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+    }
+    .slot-btn {
+      padding: 9px 4px;
+      border-radius: 9px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid transparent;
+      font-family: 'Sora', sans-serif;
+    }
+    .slot-free {
+      background: rgba(5,150,105,0.12);
+      color: #34d399;
+      border-color: rgba(5,150,105,0.2);
+    }
+    .slot-free:hover { filter: brightness(1.15); }
+    .slot-selected {
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 3px 12px rgba(37,99,235,0.35);
+    }
+    .slot-booked {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-3);
+      border-color: var(--border);
+    }
+    .slot-booked:hover { background: rgba(255,255,255,0.06); color: var(--text-2); }
+
+    /* DRIVER STATUS */
+    .driver-card {
+      display: none;
+      background: var(--surface);
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 14px;
+    }
+    .driver-card h4 {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--blue-mid);
+      margin-bottom: 12px;
+    }
+    .driver-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .driver-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .driver-name { font-weight: 600; color: var(--text); }
+    .badge-free {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 9px; font-weight: 700;
+      font-family: var(--mono); letter-spacing: 1px;
+      background: rgba(5,150,105,0.12);
+      border: 1px solid rgba(5,150,105,0.25);
+      color: #34d399;
+    }
+    .badge-busy {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 9px; font-weight: 700;
+      font-family: var(--mono); letter-spacing: 1px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171;
+    }
+
+    /* SUBMIT ACTIONS */
+    .action-row {
+      display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;
+    }
+    .btn-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px;
+      background: var(--blue);
+      border: none; border-radius: 12px;
+      color: white; font-family: 'Sora', sans-serif;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--blue-glow);
+      transition: background .2s, transform .15s;
+    }
+    .btn-submit:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-clear {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-3); font-family: 'Sora', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-clear:hover { border-color: var(--border-hi); color: var(--text); }
+
+    /* NOTE */
+    .note {
+      font-size: 11px; color: var(--text-3);
+      margin-top: 12px; font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ALERT */
+    .alert {
+      display: none; padding: 14px 16px;
+      border-radius: 12px; font-size: 13px;
+      font-weight: 600; margin-top: 16px;
+      line-height: 1.5;
+    }
+    .alert.success {
+      display: block;
+      background: rgba(5,150,105,0.12);
+      border: 1px solid rgba(5,150,105,0.25);
+      color: #34d399;
+    }
+    .alert.error {
+      display: block;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.25);
+      color: var(--error);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      justify-content: center; align-items: flex-end;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: #07111f;
+      border: 1px solid var(--border-hi);
+      border-radius: 24px 24px 0 0;
+      padding: 28px 24px 44px;
+      width: 100%; max-width: 480px;
+      animation: slideUp .3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-handle { width: 40px; height: 4px; border-radius: 99px; background: var(--border); margin: 0 auto 20px; }
+    .modal-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
+    .modal-detail {
+      font-size: 13px; line-height: 1.8; color: var(--text-2);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; margin-bottom: 16px;
+    }
+    .modal-detail b { color: var(--blue-mid); font-weight: 700; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .modal-btn-ok {
+      flex: 1; padding: 14px; border: none; border-radius: 10px;
+      background: var(--blue); color: white;
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .modal-btn-ok:hover { background: #1d4ed8; }
+    .modal-btn-cancel {
+      flex: 1; padding: 14px; border: 1px solid var(--border); border-radius: 10px;
+      background: transparent; color: var(--text-3);
+      font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .modal-btn-cancel:hover { border-color: var(--border-hi); color: var(--text); }
+
+    /* SPINNER */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin .7s linear infinite; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      main { padding: 20px 14px 80px; }
+      .form-row { flex-direction: column; }
+      .form-col-sm { flex: 1; }
+      .page-banner::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <a href="hub.html" class="back-btn">← Kembali</a>
+    <div class="hdr-title">Tempahan <span>Kenderaan</span></div>
+  </div>
+  <div class="user-chip">
+    <div class="user-avatar" id="userInitial">?</div>
+    <div class="user-name-chip" id="userName">—</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- BANNER -->
+  <div class="page-banner">
+    <div>
+      <div class="banner-title">🚗 Sistem Tempahan Kenderaan</div>
+      <div class="banner-sub">Yayasan Waqaf Malaysia — Isi borang untuk membuat tempahan</div>
+      <div class="vehicle-pills" id="vehiclePills"></div>
+    </div>
+  </div>
+
+  <!-- MAKLUMAT PEMOHON -->
+  <div class="slbl">Maklumat Pemohon</div>
+
+  <div id="autofillBar" class="autofill-bar">
+    <span>⚡ Maklumat diisi semula — <span id="autofillName"></span></span>
+    <button class="autofill-clear" onclick="clearProfile()">Tukar Profil</button>
+  </div>
+
+  <div class="form-card">
+    <label class="form-label">Nama Pemohon</label>
+    <input type="text" class="form-input" id="nama" placeholder="Nama panggilan">
+
+    <div class="form-row">
+      <div class="form-col">
+        <label class="form-label">Emel Pemohon</label>
+        <input type="email" class="form-input" id="emel" placeholder="emel@ywm.gov.my">
+      </div>
+      <div class="form-col">
+        <label class="form-label">Bahagian</label>
+        <select class="form-select" id="bahagian">
+          <option value="" disabled selected>-- Pilih Bahagian --</option>
+          <option>Pejabat KPE</option>
+          <option>Kewangan (BKW)</option>
+          <option>Dasar & Pembangunan (BDP)</option>
+          <option>Pengurusan Dana (BPD)</option>
+          <option>Unit Undang-Undang (PUU)</option>
+          <option>Pemasaran & Korporat (BPK)</option>
+          <option>Pengurusan (BPS)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUTIRAN PERJALANAN -->
+  <div class="slbl">Butiran Perjalanan</div>
+  <div class="form-card">
+
+    <div class="form-row">
+      <div class="form-col">
+        <label class="form-label">Jenis Kenderaan</label>
+        <select class="form-select" id="kenderaan" onchange="updateVehiclePills()">
+          <option>Toyota Innova (VMG 4180)</option>
+          <option>Toyota Hilux (VHU 142)</option>
+          <option>Perodua Alza (VQK 3771)</option>
+        </select>
+      </div>
+      <div class="form-col">
+        <label class="form-label">Keperluan Pemandu</label>
+        <select class="form-select" id="keperluan" onchange="togglePemanduBox()">
+          <option value="Pemandu BPS">Pemandu BPS</option>
+          <option value="Pandu Sendiri">Pemandu Ganti / Pandu Sendiri</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="boxPemandu" style="display:none">
+      <label class="form-label">Nama Pemandu Ganti / Sendiri</label>
+      <input type="text" class="form-input" id="namaPemandu" placeholder="Nama pemandu">
+    </div>
+
+    <label class="form-label">Lokasi / Destinasi</label>
+    <input type="text" class="form-input" id="lokasi" placeholder="Contoh: Putrajaya, Kuala Lumpur">
+
+    <label class="form-label">Tujuan Perjalanan</label>
+    <textarea class="form-textarea" id="tujuan" placeholder="Huraikan tujuan perjalanan"></textarea>
+
+    <div class="form-row">
+      <div class="form-col">
+        <label class="form-label">Nama Penumpang</label>
+        <input type="text" class="form-input" id="penumpang" placeholder="Nama-nama penumpang">
+      </div>
+      <div class="form-col-sm">
+        <label class="form-label">Masa Pergerakan</label>
+        <input type="time" class="form-input" id="anggaranMasa">
+      </div>
+    </div>
+  </div>
+
+  <!-- PILIHAN TARIKH & SLOT -->
+  <div class="slbl">Pilihan Tarikh & Slot</div>
+  <div class="form-card">
+    <div class="form-row" style="align-items:flex-end">
+      <div class="form-col">
+        <label class="form-label">Tarikh Mula</label>
+        <input type="date" class="form-input" id="tarikhMula">
+      </div>
+      <div class="form-col">
+        <label class="form-label">Tarikh Tamat</label>
+        <input type="date" class="form-input" id="tarikhTamat">
+      </div>
+      <div>
+        <button class="semak-btn" onclick="semakSlot()">🔍 Semak Slot</button>
+      </div>
+    </div>
+    <div class="check-row" onclick="toggleFullDay()">
+      <input type="checkbox" id="fullDay">
+      <label for="fullDay">Tempah 1 Hari Penuh (Auto pilih semua slot kosong)</label>
+    </div>
+  </div>
+
+  <!-- DRIVER STATUS -->
+  <div class="driver-card" id="driverCard">
+    <h4>Status Ketersediaan Pemandu</h4>
+    <div id="driverList"></div>
+  </div>
+
+  <!-- SLOTS -->
+  <div id="slotsContainer"></div>
+
+  <p class="note">💡 Slot hijau = kosong (klik untuk pilih). Slot kelabu = sudah ditempah (klik untuk join/carpool).</p>
+
+  <!-- ACTIONS -->
+  <div class="action-row">
+    <button class="btn-submit" id="submitBtn" onclick="submitBooking()">📨 Hantar Tempahan</button>
+    <button class="btn-clear" onclick="clearSlots()">✕ Kosongkan</button>
+  </div>
+
+  <div class="alert" id="alertMsg"></div>
+
+</main>
+
+<!-- JOIN MODAL -->
+<div class="modal-overlay" id="joinModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👥 Butiran Tempahan (Carpool)</div>
+    <div class="modal-detail" id="joinDetail"></div>
+    <label class="form-label">Destinasi Anda (Carpool)</label>
+    <input type="text" class="form-input" id="joinerDest" placeholder="Cth: KKM Putrajaya (8am – 10am)">
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="modal-btn-ok" onclick="confirmJoin()">✓ Join</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { supabase, requireAuth, getProfile } from './js/supabase.js'
+
+  const SENARAI_PEMANDU = ['En Zainol', 'En Rusydi', 'En Azlan', 'En Umair', 'En Ezzuwan']
+  const KENDERAAN = ['Toyota Innova (VMG 4180)', 'Toyota Hilux (VHU 142)', 'Perodua Alza (VQK 3771)']
+  const PROFILE_KEY = 'kenderaan_profil'
+
+  let bookedData = []
+  let selectedJoin = null
+  let userSession = null
+
+  // ── INIT ──
+  async function init() {
+    userSession = await requireAuth()
+    if (!userSession) return
+
+    const profile = (await getProfile(userSession.user.id)).data
+    const nama = profile?.nama || userSession.user.email.split('@')[0]
+    document.getElementById('userInitial').textContent = nama.charAt(0).toUpperCase()
+    document.getElementById('userName').textContent = nama
+
+    loadSavedProfile(nama, userSession.user.email, profile?.bahagian)
+    updateVehiclePills()
+
+    // Set min tarikh = hari ni
+    const today = new Date().toISOString().split('T')[0]
+    document.getElementById('tarikhMula').min = today
+    document.getElementById('tarikhTamat').min = today
+  }
+
+  // ── VEHICLE PILLS ──
+  window.updateVehiclePills = function() {
+    const selected = document.getElementById('kenderaan').value
+    document.getElementById('vehiclePills').innerHTML = KENDERAAN.map(v =>
+      `<div class="vehicle-pill ${v === selected ? 'active' : ''}" onclick="selectVehicle('${v}')">${v}</div>`
+    ).join('')
+  }
+
+  window.selectVehicle = function(v) {
+    document.getElementById('kenderaan').value = v
+    updateVehiclePills()
+    clearSlots()
+  }
+
+  // ── AUTOFILL ──
+  function loadSavedProfile(defaultNama, defaultEmail, defaultBahagian) {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null')
+      const nama = saved?.nama || defaultNama || ''
+      const emel = saved?.emel || defaultEmail || ''
+      const bahagian = saved?.bahagian || defaultBahagian || ''
+
+      document.getElementById('nama').value = nama
+      document.getElementById('emel').value = emel
+      if (bahagian) {
+        const sel = document.getElementById('bahagian')
+        for (let i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === bahagian) { sel.selectedIndex = i; break }
+        }
+      }
+      if (nama) {
+        document.getElementById('autofillName').textContent = nama
+        document.getElementById('autofillBar').classList.add('show')
+      }
+    } catch(e) {}
+  }
+
+  window.clearProfile = function() {
+    localStorage.removeItem(PROFILE_KEY)
+    document.getElementById('nama').value = ''
+    document.getElementById('emel').value = ''
+    document.getElementById('bahagian').selectedIndex = 0
+    document.getElementById('autofillBar').classList.remove('show')
+    document.getElementById('nama').focus()
+  }
+
+  function saveProfile() {
+    const nama = document.getElementById('nama').value.trim()
+    const emel = document.getElementById('emel').value.trim()
+    const bahagian = document.getElementById('bahagian').value
+    if (!nama || !emel) return
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ nama, emel, bahagian })) } catch(e) {}
+  }
+
+  // ── TOGGLE PEMANDU BOX ──
+  window.togglePemanduBox = function() {
+    const v = document.getElementById('keperluan').value
+    document.getElementById('boxPemandu').style.display = v === 'Pandu Sendiri' ? 'block' : 'none'
+    if (v !== 'Pandu Sendiri') document.getElementById('namaPemandu').value = ''
+  }
+
+  // ── FULL DAY ──
+  window.toggleFullDay = function() {
+    const cb = document.getElementById('fullDay')
+    cb.checked = !cb.checked
+    applyFullDay()
+  }
+
+  function applyFullDay() {
+    if (!document.getElementById('fullDay').checked) {
+      document.querySelectorAll('.slot-selected').forEach(b => b.classList.remove('slot-selected'))
+      document.getElementById('driverCard').style.display = 'none'
+      return
+    }
+    document.querySelectorAll('.slot-free').forEach(b => b.classList.add('slot-selected'))
+    updateDriverStatus()
+  }
+
+  // ── SEMAK SLOT ──
+  window.semakSlot = async function() {
+    const kenderaan = document.getElementById('kenderaan').value
+    const mula = document.getElementById('tarikhMula').value
+    const tamat = document.getElementById('tarikhTamat').value || mula
+
+    if (!mula) { showAlert('Sila pilih tarikh mula.', 'error'); return }
+
+    document.getElementById('slotsContainer').innerHTML =
+      '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px;">🔍 Menyemak slot...</div>'
+    document.getElementById('driverCard').style.display = 'none'
+    bookedData = []
+
+    // Generate date range
+    const dates = []
+    const d = new Date(mula)
+    const end = new Date(tamat)
+    while (d <= end) {
+      dates.push(d.toISOString().split('T')[0])
+      d.setDate(d.getDate() + 1)
+    }
+
+    // Fetch existing bookings for this vehicle & date range
+    const { data: bookings } = await supabase
+      .from('tempahan_kenderaan')
+      .select('tarikh_mula, tarikh_tamat, nama, destinasi, tujuan, penumpang, pemandu, status')
+      .eq('kenderaan', kenderaan)
+      .not('status', 'in', '("DITOLAK","DIBATALKAN")')
+      .gte('tarikh_tamat', mula + 'T00:00:00')
+      .lte('tarikh_mula', tamat + 'T23:59:59')
+
+    renderSlots(dates, bookings || [])
+  }
+
+  function renderSlots(dates, bookings) {
+    const container = document.getElementById('slotsContainer')
+    container.innerHTML = ''
+    bookedData = []
+
+    dates.forEach(dateStr => {
+      const block = document.createElement('div')
+      block.className = 'day-block'
+
+      const d = new Date(dateStr)
+      const label = d.toLocaleDateString('ms-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+      block.innerHTML = `<h4>📅 ${label}</h4>`
+
+      const grid = document.createElement('div')
+      grid.className = 'slot-grid'
+
+      // Hours 7am - 7pm (slots 7..18 = index)
+      for (let h = 7; h <= 18; h++) {
+        const slotStart = new Date(dateStr + 'T' + String(h).padStart(2,'0') + ':00:00')
+        const slotEnd   = new Date(dateStr + 'T' + String(h+1).padStart(2,'0') + ':00:00')
+        const displayTime = String(h).padStart(2,'0') + ':00 – ' + String(h+1).padStart(2,'0') + ':00'
+
+        // Check if booked
+        const booking = bookings.find(b => new Date(b.tarikh_mula) < slotEnd && new Date(b.tarikh_tamat) > slotStart)
+
+        const btn = document.createElement('div')
+        btn.className = 'slot-btn'
+        btn.textContent = displayTime
+        btn.dataset.date = dateStr
+        btn.dataset.hour = h
+
+        if (!booking) {
+          btn.classList.add('slot-free')
+          btn.onclick = () => {
+            btn.classList.toggle('slot-selected')
+            document.getElementById('fullDay').checked = false
+            updateDriverStatus()
+          }
+        } else {
+          btn.classList.add('slot-booked')
+          bookedData.push({ dateStr, hour: h, ...booking })
+          btn.onclick = () => openJoinModal(dateStr, h, booking)
+        }
+
+        grid.appendChild(btn)
+      }
+
+      block.appendChild(grid)
+      container.appendChild(block)
+    })
+  }
+
+  // ── DRIVER STATUS ──
+  function updateDriverStatus() {
+    const selected = document.querySelectorAll('.slot-selected')
+    if (!selected.length) {
+      document.getElementById('driverCard').style.display = 'none'
+      return
+    }
+
+    const busyDrivers = new Set()
+    selected.forEach(btn => {
+      const dateStr = btn.dataset.date
+      const hour = parseInt(btn.dataset.hour)
+      bookedData.forEach(b => {
+        if (b.dateStr === dateStr && b.hour === hour && b.pemandu && b.pemandu !== '-') {
+          busyDrivers.add(b.pemandu.trim())
+        }
+      })
+    })
+
+    document.getElementById('driverList').innerHTML = SENARAI_PEMANDU.map(d => {
+      const busy = [...busyDrivers].some(b => b.includes(d))
+      return `<div class="driver-row">
+        <span class="driver-name">${d}</span>
+        ${busy
+          ? '<span class="badge-busy">✕ Sibuk</span>'
+          : '<span class="badge-free">✓ Kosong</span>'}
+      </div>`
+    }).join('')
+
+    document.getElementById('driverCard').style.display = 'block'
+  }
+
+  // ── JOIN MODAL ──
+  window.openJoinModal = function(dateStr, hour, booking) {
+    const nama = document.getElementById('nama').value
+    if (!nama) { showAlert('Sila isi nama pemohon dahulu.', 'error'); return }
+    selectedJoin = { dateStr, hour, booking }
+
+    document.getElementById('joinDetail').innerHTML = `
+      <b>Pemohon:</b> ${booking.nama}<br>
+      <b>Destinasi:</b> ${booking.destinasi}<br>
+      <b>Tujuan:</b> ${booking.tujuan}<br>
+      <b>Penumpang:</b> ${booking.penumpang || '—'}<br>
+      <b>Pemandu:</b> ${booking.pemandu || '—'}
+    `
+    document.getElementById('joinModal').classList.add('open')
+  }
+
+  window.closeModal = function() {
+    document.getElementById('joinModal').classList.remove('open')
+    document.getElementById('joinerDest').value = ''
+    selectedJoin = null
+  }
+
+  window.confirmJoin = async function() {
+    if (!selectedJoin) return
+    const dest = document.getElementById('joinerDest').value.trim()
+    if (!dest) { showAlert('Sila masukkan destinasi untuk carpool.', 'error'); return }
+
+    // For now just show success (carpool logic can be expanded)
+    closeModal()
+    showAlert('✅ Permintaan carpool dihantar!', 'success')
+  }
+
+  // ── SUBMIT ──
+  window.submitBooking = async function() {
+    const nama     = document.getElementById('nama').value.trim()
+    const emel     = document.getElementById('emel').value.trim()
+    const bahagian = document.getElementById('bahagian').value
+    const kenderaan= document.getElementById('kenderaan').value
+    const keperluan= document.getElementById('keperluan').value
+    const lokasi   = document.getElementById('lokasi').value.trim()
+    const tujuan   = document.getElementById('tujuan').value.trim()
+    const penumpang= document.getElementById('penumpang').value.trim()
+    const masa     = document.getElementById('anggaranMasa').value
+
+    if (!nama || !emel)  { showAlert('Sila isi nama dan emel.', 'error'); return }
+    if (!bahagian)        { showAlert('Sila pilih bahagian.', 'error'); return }
+    if (!lokasi || !tujuan) { showAlert('Sila isi destinasi dan tujuan perjalanan.', 'error'); return }
+
+    const selected = document.querySelectorAll('.slot-selected')
+    if (!selected.length) { showAlert('Sila pilih sekurang-kurangnya satu slot masa.', 'error'); return }
+
+    // Get date range dari slots
+    const slots = [...selected].map(b => ({ date: b.dataset.date, hour: parseInt(b.dataset.hour) }))
+    slots.sort((a, b) => a.date.localeCompare(b.date) || a.hour - b.hour)
+
+    const first = slots[0]
+    const last  = slots[slots.length - 1]
+    const tarikhMula  = first.date + 'T' + String(first.hour).padStart(2,'0') + ':00:00'
+    const tarikhTamat = last.date  + 'T' + String(last.hour + 1).padStart(2,'0') + ':00:00'
+
+    // Check conflict
+    const { data: conflict } = await supabase
+      .from('tempahan_kenderaan')
+      .select('id')
+      .eq('kenderaan', kenderaan)
+      .not('status', 'in', '("DITOLAK","DIBATALKAN")')
+      .lt('tarikh_mula', tarikhTamat)
+      .gt('tarikh_tamat', tarikhMula)
+      .limit(1)
+
+    if (conflict && conflict.length > 0) {
+      showAlert('❌ Slot telah ditempah oleh pengguna lain. Sila semak semula.', 'error')
+      await semakSlot()
+      return
+    }
+
+    const btn = document.getElementById('submitBtn')
+    btn.disabled = true
+    btn.innerHTML = '<span class="spinner"></span> Menghantar...'
+
+    const pemandu = keperluan === 'Pandu Sendiri'
+      ? document.getElementById('namaPemandu').value.trim()
+      : ''
+
+    const { error } = await supabase
+      .from('tempahan_kenderaan')
+      .insert({
+        user_id:      userSession.user.id,
+        nama, bahagian, kenderaan,
+        tarikh_mula:  tarikhMula,
+        tarikh_tamat: tarikhTamat,
+        anggaran_masa: masa,
+        destinasi:    lokasi,
+        tujuan,
+        penumpang,
+        pemandu,
+        status:       'MENUNGGU'
+      })
+
+    btn.disabled = false
+    btn.innerHTML = '📨 Hantar Tempahan'
+
+    if (error) {
+      showAlert('❌ Ralat sistem: ' + error.message, 'error')
+      return
+    }
+
+    saveProfile()
+    showAlert('✅ Tempahan berjaya dihantar! Status: MENUNGGU KELULUSAN.', 'success')
+    clearSlots()
+  }
+
+  // ── CLEAR ──
+  window.clearSlots = function() {
+    document.getElementById('slotsContainer').innerHTML = ''
+    document.getElementById('fullDay').checked = false
+    document.getElementById('driverCard').style.display = 'none'
+    bookedData = []
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('alertMsg')
+    el.textContent = msg
+    el.className = 'alert ' + type
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    setTimeout(() => { el.className = 'alert' }, 6000)
+  }
+
+  init()
+</script>
+
+</body>
+</html>
