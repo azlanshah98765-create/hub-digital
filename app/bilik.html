@@ -355,8 +355,42 @@
   import { supabase, requireAuth, getProfile } from './js/supabase.js'
 
   const PROFILE_KEY = 'bilik_profil'
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3xoEKW11SGNL_sHdQ8dQrFqMOIbOvP7lbg31pp1XxHlqL7h-DzvRik6oA6zJgVkbC8A/exec'
+
   let userSession = null
   let availTimer  = null
+
+  // ── SYNC KE GOOGLE CALENDAR ──
+  async function syncBilikToCalendar(p) {
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action:       'calendar_sync',
+          modul:        'bilik',
+          action2:      'create',
+          calendarName: p.calendarName,
+          title:        p.title,
+          tarikh:       p.tarikh,
+          masaMula:     p.masaMula,
+          masaTamat:    p.masaTamat,
+          pemohon:      p.pemohon,
+          bahagian:     p.bahagian,
+          tujuan:       p.tujuan,
+          bilPeserta:   p.bilPeserta,
+          supabaseId:   p.supabaseId
+        })
+      })
+      const data = await res.json()
+      // Save eventId back to Supabase
+      if (data.eventId && p.supabaseId) {
+        await supabase.from('tempahan_bilik').update({ gcal_event_id: data.eventId }).eq('id', p.supabaseId)
+      }
+    } catch (e) {
+      console.warn('Calendar sync gagal (non-critical):', e.message)
+    }
+  }
 
   // ── INIT ──
   async function init() {
@@ -505,7 +539,7 @@
     btn.disabled = true
     btn.innerHTML = '<span class="spinner"></span> Memproses...'
 
-    const { error } = await supabase
+    const { data: insertData, error } = await supabase
       .from('tempahan_bilik')
       .insert({
         user_id:          userSession.user.id,
@@ -516,16 +550,32 @@
         tarikh,
         masa_mula:        masaMula,
         masa_tamat:       masaTamat,
-        status:           'MENUNGGU'
+        status:           'DISAHKAN'
       })
+      .select()
+      .single()
 
     btn.disabled = false
     btn.innerHTML = '📨 Sahkan Tempahan'
 
     if (error) { showAlert('❌ Ralat sistem: ' + error.message, 'error'); return }
 
+    // ── Sync ke Google Calendar (background) ──
+    syncBilikToCalendar({
+      supabaseId:   insertData?.id,
+      calendarName: bilik,
+      tarikh,
+      masaMula:     mula,
+      masaTamat:    tamat,
+      pemohon:      nama,
+      bahagian,
+      tujuan:       perkara,
+      bilPeserta:   bilangan || '-',
+      title:        '[' + bilik + '] ' + perkara
+    })
+
     saveProfile()
-    showAlert('✅ Tempahan bilik berjaya dihantar! Status: MENUNGGU KELULUSAN.', 'success')
+    showAlert('✅ Tempahan bilik berjaya dihantar & sync ke Google Calendar!', 'success')
 
     // Reset form
     document.getElementById('perkara').value  = ''
