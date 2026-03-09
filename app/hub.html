@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hub Digital BPS</title>
+  <meta name="theme-color" content="#040c18">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:       #040c18;
+      --surface:  #07111f;
+      --surface-2:#0b1a2e;
+      --border:   rgba(255,255,255,0.07);
+      --border-hi:rgba(255,255,255,0.13);
+      --blue:     #2563eb;
+      --blue-mid: #3b82f6;
+      --blue-glow:rgba(37,99,235,0.25);
+      --teal:     #0d9488;
+      --teal-soft:rgba(13,148,136,0.12);
+      --purple:   #7c3aed;
+      --gold:     #d97706;
+      --green:    #059669;
+      --text:     #f0f4ff;
+      --text-2:   #94a3b8;
+      --text-3:   #475569;
+      --mono:     'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 0%, rgba(37,99,235,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 90% 100%, rgba(13,148,136,0.07) 0%, transparent 60%);
+    }
+
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(37,99,235,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.03) 1px, transparent 1px);
+      background-size: 52px 52px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(4,12,24,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 36px; height: 36px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .header-brand {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .header-brand span {
+      background: linear-gradient(135deg, var(--blue-mid), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 14px 6px 6px;
+    }
+
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-role {
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--text-3);
+      letter-spacing: 1px;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 14px;
+      color: var(--text-3);
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--border-hi);
+      color: var(--text);
+    }
+
+    /* ── MAIN ── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 36px 24px 60px;
+    }
+
+    /* ── WELCOME BANNER ── */
+    .welcome-banner {
+      background: linear-gradient(135deg, #0f1f3d 0%, #0a1628 50%, #051020 100%);
+      border: 1px solid var(--border-hi);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(37,99,235,0.6), rgba(13,148,136,0.5), transparent);
+    }
+
+    .welcome-banner::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(37,99,235,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .welcome-text {}
+
+    .welcome-date {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+
+    .welcome-greeting {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .welcome-sub {
+      font-size: 13px;
+      color: var(--text-3);
+    }
+
+    .welcome-stats {
+      display: flex;
+      gap: 16px;
+    }
+
+    .stat-pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 20px;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stat-num.blue { color: var(--blue-mid); }
+    .stat-num.gold { color: #fbbf24; }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── APP GRID ── */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 20px;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .app-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-hi);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .app-card:hover::before { opacity: 1; }
+
+    .app-card.blue::before  { background: linear-gradient(90deg, var(--blue), var(--blue-mid)); }
+    .app-card.teal::before  { background: linear-gradient(90deg, var(--teal), #2dd4bf); }
+    .app-card.purple::before{ background: linear-gradient(90deg, var(--purple), #a78bfa); }
+    .app-card.gold::before  { background: linear-gradient(90deg, var(--gold), #fbbf24); }
+    .app-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+
+    .app-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .app-icon.blue   { background: rgba(37,99,235,0.15); }
+    .app-icon.teal   { background: rgba(13,148,136,0.15); }
+    .app-icon.purple { background: rgba(124,58,237,0.15); }
+    .app-icon.gold   { background: rgba(217,119,6,0.15); }
+    .app-icon.green  { background: rgba(5,150,105,0.15); }
+
+    .app-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .app-desc {
+      font-size: 11px;
+      color: var(--text-3);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ── PENGUMUMAN ── */
+    .announce-section {
+      margin-bottom: 32px;
+    }
+
+    .announce-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .announce-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color .2s;
+    }
+
+    .announce-card:hover { border-color: var(--border-hi); }
+
+    .announce-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .announce-body { flex: 1; }
+
+    .announce-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .announce-content {
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+
+    .announce-date {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    .announce-empty {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 40px;
+      text-align: center;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    /* ── PERMOHONAN TERKINI ── */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .history-table th {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 10px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.menunggu  { background: rgba(217,119,6,0.12);  border: 1px solid rgba(217,119,6,0.3);  color: #fbbf24; }
+    .status-badge.disahkan  { background: rgba(5,150,105,0.12);  border: 1px solid rgba(5,150,105,0.3);  color: #34d399; }
+    .status-badge.ditolak   { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.3);  color: #f87171; }
+    .status-badge.dibatalkan{ background: rgba(100,116,139,0.12);border: 1px solid rgba(100,116,139,0.3);color: #94a3b8; }
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .empty-row {
+      text-align: center;
+      color: var(--text-3) !important;
+      padding: 32px !important;
+      font-size: 13px !important;
+    }
+
+    /* ── LOADING SKELETON ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+      height: 16px;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      header { padding: 0 16px; }
+      main { padding: 20px 16px 60px; }
+      .app-grid { grid-template-columns: repeat(2, 1fr); }
+      .welcome-banner { flex-direction: column; gap: 20px; align-items: flex-start; }
+      .welcome-stats { width: 100%; }
+      .stat-pill { flex: 1; }
+      .user-name { max-width: 80px; }
+      .history-table { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <img src="../Untitled_design-removebg-preview.png" alt="BPS" class="header-logo">
+    <div>
+      <div class="header-brand">Hub Digital <span>BPS</span></div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="user-chip">
+      <div class="user-avatar" id="userInitial">?</div>
+      <div>
+        <div class="user-name" id="userName">Memuatkan...</div>
+        <div class="user-role" id="userBahagian">—</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="handleLogout()">Log Keluar</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- Welcome Banner -->
+  <div class="welcome-banner">
+    <div class="welcome-text">
+      <div class="welcome-date" id="hariIni">—</div>
+      <div class="welcome-greeting">Selamat Datang, <span id="greetName">—</span> 👋</div>
+      <div class="welcome-sub">Bahagian Pengurusan Sokongan — Yayasan Waqaf Malaysia</div>
+    </div>
+    <div class="welcome-stats">
+      <div class="stat-pill">
+        <div class="stat-num blue" id="statAktif">—</div>
+        <div class="stat-label">Aktif Hari Ini</div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-num gold" id="statMenunggu">—</div>
+        <div class="stat-label">Menunggu</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apps -->
+  <div class="section-label">Aplikasi Utama</div>
+  <div class="app-grid">
+    <a class="app-card blue" href="kenderaan.html">
+      <div class="app-icon blue">🚗</div>
+      <div class="app-name">Tempahan Kenderaan</div>
+      <div class="app-desc">Tempah kenderaan rasmi YWM</div>
+    </a>
+    <a class="app-card teal" href="bilik.html">
+      <div class="app-icon teal">🏢</div>
+      <div class="app-name">Tempahan Bilik</div>
+      <div class="app-desc">Tempah bilik mesyuarat</div>
+    </a>
+    <a class="app-card purple" href="aset.html">
+      <div class="app-icon purple">🖥️</div>
+      <div class="app-name">Permohonan Aset</div>
+      <div class="app-desc">Mohon aset ICT & pejabat</div>
+    </a>
+    <a class="app-card gold" href="stok.html">
+      <div class="app-icon gold">📦</div>
+      <div class="app-name">Permohonan Stok</div>
+      <div class="app-desc">Mohon barang keperluan</div>
+    </a>
+  </div>
+
+  <!-- Pengumuman -->
+  <div class="announce-section">
+    <div class="section-label">Pengumuman</div>
+    <div class="announce-list" id="announceList">
+      <div class="announce-empty">Memuatkan pengumuman...</div>
+    </div>
+  </div>
+
+  <!-- Permohonan Terkini -->
+  <div>
+    <div class="section-label">Permohonan Terkini Saya</div>
+    <div class="table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Jenis</th>
+            <th>Butiran</th>
+            <th>Tarikh</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody">
+          <tr><td class="empty-row" colspan="4">Memuatkan...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script type="module">
+  import { supabase, requireAuth, signOut, getProfile } from './js/supabase.js'
+
+  let profile = null
+
+  // ── INIT ──
+  async function init() {
+    const session = await requireAuth()
+    if (!session) return
+
+    profile = (await getProfile(session.user.id)).data
+
+    // Set header
+    const nama = profile?.nama || session.user.email.split('@')[0]
+    const bahagian = profile?.bahagian || '—'
+    const initial = nama.charAt(0).toUpperCase()
+
+    document.getElementById('userInitial').textContent   = initial
+    document.getElementById('userName').textContent      = nama
+    document.getElementById('userBahagian').textContent  = bahagian
+    document.getElementById('greetName').textContent     = nama.split(' ')[0]
+
+    // Set date
+    const now = new Date()
+    const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' }
+    document.getElementById('hariIni').textContent = now.toLocaleDateString('ms-MY', opts).toUpperCase()
+
+    // Load data
+    await Promise.all([
+      loadStats(session.user.id),
+      loadAnnouncements(),
+      loadHistory(session.user.id)
+    ])
+  }
+
+  // ── STATS ──
+  async function loadStats(userId) {
+    const today = new Date().toISOString().split('T')[0]
+
+    // Count aktif hari ini (kenderaan)
+    const { count: aktif } = await supabase
+      .from('tempahan_kenderaan')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'DISAHKAN')
+      .gte('tarikh_mula', today + 'T00:00:00')
+      .lte('tarikh_mula', today + 'T23:59:59')
+
+    // Count menunggu semua modul
+    const [k, b, a, s] = await Promise.all([
+      supabase.from('tempahan_kenderaan').select('*', { count:'exact', head:true }).eq('user_id', userId).eq('status','MENUNGGU'),
+      supabase.from('tempahan_bilik').select('*', { count:'exact', head:true }).eq('user_id', userId).eq('status','MENUNGGU'),
+      supabase.from('permohonan_aset').select('*', { count:'exact', head:true }).eq('user_id', userId).eq('status','MENUNGGU'),
+      supabase.from('permohonan_stok').select('*', { count:'exact', head:true }).eq('user_id', userId).eq('status','MENUNGGU'),
+    ])
+
+    const totalMenunggu = (k.count||0) + (b.count||0) + (a.count||0) + (s.count||0)
+
+    document.getElementById('statAktif').textContent    = aktif || 0
+    document.getElementById('statMenunggu').textContent = totalMenunggu
+  }
+
+  // ── ANNOUNCEMENTS ──
+  async function loadAnnouncements() {
+    const today = new Date().toISOString().split('T')[0]
+    const { data, error } = await supabase
+      .from('pengumuman')
+      .select('*')
+      .eq('is_active', true)
+      .gte('tamat_pada', today)
+      .order('created_at', { ascending: false })
+      .limit(5)
+
+    const list = document.getElementById('announceList')
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div class="announce-empty">📭 Tiada pengumuman buat masa ini</div>'
+      return
+    }
+
+    list.innerHTML = data.map(a => `
+      <div class="announce-card">
+        <div class="announce-icon">📢</div>
+        <div class="announce-body">
+          <div class="announce-title">${a.tajuk}</div>
+          <div class="announce-content">${a.kandungan}</div>
+          <div class="announce-date">Tamat: ${new Date(a.tamat_pada).toLocaleDateString('ms-MY')}</div>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  // ── HISTORY ──
+  async function loadHistory(userId) {
+    const [k, b, a, s] = await Promise.all([
+      supabase.from('tempahan_kenderaan').select('id,kenderaan,destinasi,tarikh_mula,status,created_at').eq('user_id', userId).order('created_at', {ascending:false}).limit(3),
+      supabase.from('tempahan_bilik').select('id,bilik,tujuan,tarikh,status,created_at').eq('user_id', userId).order('created_at', {ascending:false}).limit(3),
+      supabase.from('permohonan_aset').select('id,jenis_aset,keperluan,tarikh_diperlukan,status,created_at').eq('user_id', userId).order('created_at', {ascending:false}).limit(3),
+      supabase.from('permohonan_stok').select('id,nama_barang,kuantiti,status,created_at').eq('user_id', userId).order('created_at', {ascending:false}).limit(3),
+    ])
+
+    const rows = [
+      ...(k.data||[]).map(r => ({ jenis:'Kenderaan', butiran: r.kenderaan + ' → ' + r.destinasi, tarikh: r.tarikh_mula, status: r.status })),
+      ...(b.data||[]).map(r => ({ jenis:'Bilik',     butiran: r.bilik + ' — ' + r.tujuan, tarikh: r.tarikh, status: r.status })),
+      ...(a.data||[]).map(r => ({ jenis:'Aset',      butiran: r.jenis_aset, tarikh: r.tarikh_diperlukan, status: r.status })),
+      ...(s.data||[]).map(r => ({ jenis:'Stok',      butiran: r.nama_barang + ' (x' + r.kuantiti + ')', tarikh: r.created_at, status: r.status })),
+    ].sort((a,b) => new Date(b.tarikh) - new Date(a.tarikh)).slice(0,8)
+
+    const tbody = document.getElementById('historyBody')
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td class="empty-row" colspan="4">Tiada permohonan lagi</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td style="color:var(--text);font-weight:600">${r.jenis}</td>
+        <td>${r.butiran || '—'}</td>
+        <td style="font-family:var(--mono);font-size:11px">${r.tarikh ? new Date(r.tarikh).toLocaleDateString('ms-MY') : '—'}</td>
+        <td>${statusBadge(r.status)}</td>
+      </tr>
+    `).join('')
+  }
+
+  function statusBadge(status) {
+    const s = (status || '').toLowerCase()
+    const map = { menunggu:'menunggu', disahkan:'disahkan', ditolak:'ditolak', dibatalkan:'dibatalkan' }
+    const cls = map[s] || 'menunggu'
+    return `<span class="status-badge ${cls}">${status}</span>`
+  }
+
+  window.handleLogout = async function() {
+    await signOut()
+  }
+
+  init()
+</script>
+
+</body>
+</html>
