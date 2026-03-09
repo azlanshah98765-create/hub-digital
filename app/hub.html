@@ -506,6 +506,357 @@
       100% { background-position: -200% 0; }
     }
 
+    /* ── AVAILABILITY CHECKER ── */
+    .avail-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .avail-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .avail-tab {
+      flex: 1;
+      padding: 14px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-3);
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .avail-tab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+
+    .avail-tab.active {
+      color: var(--blue-mid);
+      border-bottom: 2px solid var(--blue);
+      background: rgba(37,99,235,0.05);
+    }
+
+    .avail-panel { display: none; padding: 24px; }
+    .avail-panel.active { display: block; }
+
+    /* Calendar */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .cal-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .cal-nav {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-2);
+      font-size: 16px;
+      transition: all .2s;
+    }
+
+    .cal-nav:hover { border-color: var(--border-hi); color: var(--text); }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .cal-day-label {
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: var(--text-3);
+      padding: 6px 0;
+      text-transform: uppercase;
+    }
+
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative;
+      border: 1px solid transparent;
+    }
+
+    .cal-day:hover:not(.empty):not(.past) {
+      background: rgba(37,99,235,0.15);
+      border-color: rgba(37,99,235,0.3);
+      color: var(--text);
+    }
+
+    .cal-day.empty { cursor: default; }
+    .cal-day.past  { opacity: 0.3; cursor: default; }
+
+    .cal-day.today {
+      background: rgba(37,99,235,0.1);
+      border-color: rgba(37,99,235,0.4);
+      color: var(--blue-mid);
+      font-weight: 700;
+    }
+
+    .cal-day.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+      font-weight: 700;
+    }
+
+    .cal-day.has-booking::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: #f87171;
+    }
+
+    .cal-day.selected.has-booking::after { background: rgba(255,255,255,0.7); }
+
+    .cal-day.fully-booked {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.2);
+      color: #f87171;
+    }
+
+    .cal-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-3);
+    }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+    }
+
+    /* Date picker row */
+    .avail-picker {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .avail-picker-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .avail-picker-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    .avail-input {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      width: 100%;
+      transition: border-color .2s;
+    }
+
+    .avail-input:focus { outline: none; border-color: var(--blue); }
+
+    .avail-check-btn {
+      background: linear-gradient(135deg, var(--blue), #1d4ed8);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      color: white;
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .avail-check-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* Results */
+    .avail-results {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .avail-results.show { display: flex; }
+
+    .avail-result-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-2);
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .vehicle-row, .room-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      gap: 12px;
+      transition: border-color .2s;
+    }
+
+    .vehicle-row:hover, .room-row:hover { border-color: var(--border-hi); }
+
+    .vehicle-row.available  { border-color: rgba(5,150,105,0.3); }
+    .vehicle-row.unavailable{ border-color: rgba(239,68,68,0.2); }
+    .room-row.available     { border-color: rgba(5,150,105,0.3); }
+    .room-row.unavailable   { border-color: rgba(239,68,68,0.2); }
+
+    .vr-left { display: flex; align-items: center; gap: 12px; }
+
+    .vr-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .vr-icon.available   { background: rgba(5,150,105,0.12); }
+    .vr-icon.unavailable { background: rgba(239,68,68,0.08); }
+
+    .vr-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .vr-info {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .vr-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+    .avail-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: var(--mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .avail-badge.kosong   { background: rgba(5,150,105,0.12);  border: 1px solid rgba(5,150,105,0.3);  color: #34d399; }
+    .avail-badge.penuh    { background: rgba(239,68,68,0.10);  border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+    .avail-badge.sebahagian { background: rgba(217,119,6,0.10); border: 1px solid rgba(217,119,6,0.3); color: #fbbf24; }
+
+    .tempah-btn {
+      background: linear-gradient(135deg, var(--blue), #1d4ed8);
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      color: white;
+      font-family: 'Sora', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tempah-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .tempah-btn:disabled, .tempah-btn.disabled {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-3);
+      cursor: not-allowed;
+      transform: none;
+      pointer-events: none;
+    }
+
+    /* Bilik slot timeline */
+    .slot-timeline {
+      margin-top: 10px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .slot-chip {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-family: var(--mono);
+      font-weight: 500;
+    }
+
+    .slot-chip.booked { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .slot-chip.free   { background: rgba(5,150,105,0.10); color: #34d399; border: 1px solid rgba(5,150,105,0.2); }
+
+    .avail-empty {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       header { padding: 0 16px; }
@@ -516,6 +867,8 @@
       .stat-pill { flex: 1; }
       .user-name { max-width: 80px; }
       .history-table { display: none; }
+      .avail-picker { flex-direction: column; }
+      .avail-picker-group { min-width: unset; width: 100%; }
     }
   </style>
 </head>
@@ -593,6 +946,117 @@
       <div class="app-name">Permohonan Stok</div>
       <div class="app-desc">Mohon barang keperluan</div>
     </a>
+  </div>
+
+  <!-- Semak Kekosongan -->
+  <div class="section-label">Semak Kekosongan</div>
+  <div class="avail-wrap">
+
+    <!-- Tabs -->
+    <div class="avail-tabs">
+      <button class="avail-tab active" onclick="switchAvailTab('kenderaan')">
+        🚗 Kenderaan
+      </button>
+      <button class="avail-tab" onclick="switchAvailTab('bilik')">
+        🏢 Bilik Mesyuarat
+      </button>
+    </div>
+
+    <!-- ── KENDERAAN PANEL ── -->
+    <div class="avail-panel active" id="panelKenderaan">
+
+      <!-- Calendar -->
+      <div class="cal-header">
+        <button class="cal-nav" onclick="kCalNav(-1)">‹</button>
+        <div class="cal-title" id="kCalTitle">—</div>
+        <button class="cal-nav" onclick="kCalNav(1)">›</button>
+      </div>
+
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(5,150,105,0.5)"></div> Ada kekosongan</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,0.5)"></div> Semua penuh</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(217,119,6,0.5)"></div> Sebahagian kosong</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Dipilih</div>
+      </div>
+
+      <div class="cal-grid" id="kCalGrid">
+        <div class="cal-day-label">Ahd</div>
+        <div class="cal-day-label">Isn</div>
+        <div class="cal-day-label">Sel</div>
+        <div class="cal-day-label">Rab</div>
+        <div class="cal-day-label">Kha</div>
+        <div class="cal-day-label">Jum</div>
+        <div class="cal-day-label">Sab</div>
+      </div>
+
+      <!-- Date picker -->
+      <div class="avail-picker">
+        <div class="avail-picker-group">
+          <div class="avail-picker-label">Tarikh Mula</div>
+          <input type="date" class="avail-input" id="kDateMula" onchange="syncKCal()">
+        </div>
+        <div class="avail-picker-group">
+          <div class="avail-picker-label">Tarikh Tamat</div>
+          <input type="date" class="avail-input" id="kDateTamat" onchange="syncKCal()">
+        </div>
+        <button class="avail-check-btn" onclick="checkKenderaan()">Semak →</button>
+      </div>
+
+      <!-- Results -->
+      <div class="avail-results" id="kResults">
+        <div class="avail-result-title" id="kResultTitle"></div>
+      </div>
+    </div>
+
+    <!-- ── BILIK PANEL ── -->
+    <div class="avail-panel" id="panelBilik">
+
+      <!-- Calendar -->
+      <div class="cal-header">
+        <button class="cal-nav" onclick="bCalNav(-1)">‹</button>
+        <div class="cal-title" id="bCalTitle">—</div>
+        <button class="cal-nav" onclick="bCalNav(1)">›</button>
+      </div>
+
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(5,150,105,0.5)"></div> Semua bilik kosong</div>
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,0.5)"></div> Ada tempahan</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Dipilih</div>
+      </div>
+
+      <div class="cal-grid" id="bCalGrid">
+        <div class="cal-day-label">Ahd</div>
+        <div class="cal-day-label">Isn</div>
+        <div class="cal-day-label">Sel</div>
+        <div class="cal-day-label">Rab</div>
+        <div class="cal-day-label">Kha</div>
+        <div class="cal-day-label">Jum</div>
+        <div class="cal-day-label">Sab</div>
+      </div>
+
+      <!-- Date + masa picker -->
+      <div class="avail-picker">
+        <div class="avail-picker-group">
+          <div class="avail-picker-label">Tarikh</div>
+          <input type="date" class="avail-input" id="bDate" onchange="syncBCal()">
+        </div>
+        <div class="avail-picker-group">
+          <div class="avail-picker-label">Masa Mula</div>
+          <input type="time" class="avail-input" id="bMasaMula" value="08:00">
+        </div>
+        <div class="avail-picker-group">
+          <div class="avail-picker-label">Masa Tamat</div>
+          <input type="time" class="avail-input" id="bMasaTamat" value="10:00">
+        </div>
+        <button class="avail-check-btn" onclick="checkBilik()">Semak →</button>
+      </div>
+
+      <!-- Results -->
+      <div class="avail-results" id="bResults">
+        <div class="avail-result-title" id="bResultTitle"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Pengumuman -->
@@ -765,7 +1229,358 @@
     await signOut()
   }
 
-  init()
+  // ════════════════════════════════════════════
+  // AVAILABILITY CHECKER
+  // ════════════════════════════════════════════
+
+  const KENDERAAN_LIST = [
+    { id: 'proton_perdana', nama: 'Proton Perdana (WA 1234)', icon: '🚗' },
+    { id: 'toyota_hiace',   nama: 'Toyota Hiace (WB 5678)',  icon: '🚐' },
+    { id: 'perodua_axia',   nama: 'Perodua Axia (WC 9012)',  icon: '🚗' },
+  ]
+
+  const BILIK_LIST = [
+    { id: 'bilik_mesyuarat_a', nama: 'Bilik Mesyuarat A', icon: '🏛️', kapasiti: 20 },
+    { id: 'bilik_mesyuarat_b', nama: 'Bilik Mesyuarat B', icon: '🏢', kapasiti: 10 },
+    { id: 'bilik_latihan',     nama: 'Bilik Latihan',      icon: '📚', kapasiti: 30 },
+  ]
+
+  // ── Tab switch ──
+  window.switchAvailTab = function(tab) {
+    document.querySelectorAll('.avail-tab').forEach((t,i) => {
+      t.classList.toggle('active', (tab === 'kenderaan' && i === 0) || (tab === 'bilik' && i === 1))
+    })
+    document.getElementById('panelKenderaan').classList.toggle('active', tab === 'kenderaan')
+    document.getElementById('panelBilik').classList.toggle('active', tab === 'bilik')
+  }
+
+  // ════ KENDERAAN CALENDAR ════
+  let kCalYear, kCalMonth, kBookingDates = {}
+
+  async function initKCal() {
+    const now = new Date()
+    kCalYear  = now.getFullYear()
+    kCalMonth = now.getMonth()
+
+    // Set default dates
+    const today = now.toISOString().split('T')[0]
+    document.getElementById('kDateMula').value  = today
+    document.getElementById('kDateTamat').value = today
+    document.getElementById('kDateMula').min    = today
+    document.getElementById('kDateTamat').min   = today
+
+    await loadKBookings()
+    renderKCal()
+  }
+
+  async function loadKBookings() {
+    // Load all confirmed/pending bookings for current month view
+    const start = new Date(kCalYear, kCalMonth, 1).toISOString().split('T')[0]
+    const end   = new Date(kCalYear, kCalMonth + 1, 0).toISOString().split('T')[0]
+
+    const { data } = await supabase
+      .from('tempahan_kenderaan')
+      .select('kenderaan, tarikh_mula, tarikh_tamat, status')
+      .in('status', ['MENUNGGU', 'DISAHKAN'])
+      .gte('tarikh_mula', start + 'T00:00:00')
+      .lte('tarikh_mula', end + 'T23:59:59')
+
+    // Build date→count map
+    kBookingDates = {}
+    if (data) {
+      data.forEach(b => {
+        const d = b.tarikh_mula ? b.tarikh_mula.split('T')[0] : null
+        if (!d) return
+        if (!kBookingDates[d]) kBookingDates[d] = 0
+        kBookingDates[d]++
+      })
+    }
+  }
+
+  function renderKCal() {
+    const title = new Date(kCalYear, kCalMonth).toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' })
+    document.getElementById('kCalTitle').textContent = title.toUpperCase()
+
+    const grid  = document.getElementById('kCalGrid')
+    const today = new Date().toDateString()
+    const selMula  = document.getElementById('kDateMula').value
+    const selTamat = document.getElementById('kDateTamat').value
+
+    // Remove old day cells (keep 7 header labels)
+    const labels = grid.querySelectorAll('.cal-day-label')
+    grid.innerHTML = ''
+    labels.forEach(l => grid.appendChild(l))
+
+    const firstDay = new Date(kCalYear, kCalMonth, 1).getDay()
+    const daysInMonth = new Date(kCalYear, kCalMonth + 1, 0).getDate()
+    const total = KENDERAAN_LIST.length
+
+    // Empty cells
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div')
+      el.className = 'cal-day empty'
+      grid.appendChild(el)
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${kCalYear}-${String(kCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+      const date    = new Date(kCalYear, kCalMonth, d)
+      const isPast  = date < new Date(new Date().setHours(0,0,0,0))
+
+      const el = document.createElement('div')
+      el.className = 'cal-day'
+      el.textContent = d
+
+      if (isPast) {
+        el.classList.add('past')
+      } else {
+        const bookings = kBookingDates[dateStr] || 0
+        if (date.toDateString() === today) el.classList.add('today')
+        if (bookings >= total) { el.classList.add('fully-booked', 'has-booking') }
+        else if (bookings > 0)  { el.classList.add('has-booking') }
+
+        // Selected range highlight
+        if (selMula && selTamat && dateStr >= selMula && dateStr <= selTamat) {
+          el.classList.add('selected')
+        } else if (selMula === dateStr || selTamat === dateStr) {
+          el.classList.add('selected')
+        }
+
+        el.onclick = () => {
+          document.getElementById('kDateMula').value  = dateStr
+          document.getElementById('kDateTamat').value = dateStr
+          renderKCal()
+        }
+      }
+
+      grid.appendChild(el)
+    }
+  }
+
+  window.kCalNav = async function(dir) {
+    kCalMonth += dir
+    if (kCalMonth > 11) { kCalMonth = 0; kCalYear++ }
+    if (kCalMonth < 0)  { kCalMonth = 11; kCalYear-- }
+    await loadKBookings()
+    renderKCal()
+  }
+
+  window.syncKCal = function() { renderKCal() }
+
+  window.checkKenderaan = async function() {
+    const mula  = document.getElementById('kDateMula').value
+    const tamat = document.getElementById('kDateTamat').value
+    if (!mula || !tamat) return
+
+    const resultsEl = document.getElementById('kResults')
+    const titleEl   = document.getElementById('kResultTitle')
+    resultsEl.innerHTML = '<div class="avail-result-title">Memuatkan...</div>'
+    resultsEl.classList.add('show')
+
+    const { data } = await supabase
+      .from('tempahan_kenderaan')
+      .select('kenderaan, tarikh_mula, tarikh_tamat, status, pemandu')
+      .in('status', ['MENUNGGU', 'DISAHKAN'])
+      .lte('tarikh_mula', tamat + 'T23:59:59')
+      .gte('tarikh_tamat', mula + 'T00:00:00')
+
+    const bookedVehicles = new Set((data || []).map(b => b.kenderaan))
+
+    const dateLabel = mula === tamat
+      ? new Date(mula).toLocaleDateString('ms-MY', { weekday:'long', day:'numeric', month:'long' })
+      : `${new Date(mula).toLocaleDateString('ms-MY',{day:'numeric',month:'short'})} – ${new Date(tamat).toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})}`
+
+    resultsEl.innerHTML = `
+      <div class="avail-result-title">Keputusan untuk ${dateLabel}</div>
+      ${KENDERAAN_LIST.map(v => {
+        const booked = bookedVehicles.has(v.nama) || [...bookedVehicles].some(b => b && b.includes(v.id))
+        const avail  = !booked
+        return `
+          <div class="vehicle-row ${avail ? 'available' : 'unavailable'}">
+            <div class="vr-left">
+              <div class="vr-icon ${avail ? 'available' : 'unavailable'}">${v.icon}</div>
+              <div>
+                <div class="vr-name">${v.nama}</div>
+                <div class="vr-info">${avail ? 'Tiada tempahan pada tarikh ini' : 'Dah ditempah'}</div>
+              </div>
+            </div>
+            <div class="vr-right">
+              <span class="avail-badge ${avail ? 'kosong' : 'penuh'}">${avail ? '✓ Kosong' : '✗ Penuh'}</span>
+              ${avail
+                ? `<a href="kenderaan.html?kenderaan=${encodeURIComponent(v.nama)}&mula=${mula}&tamat=${tamat}" class="tempah-btn">Tempah →</a>`
+                : `<button class="tempah-btn disabled" disabled>Tidak Tersedia</button>`
+              }
+            </div>
+          </div>`
+      }).join('')}
+    `
+  }
+
+  // ════ BILIK CALENDAR ════
+  let bCalYear, bCalMonth, bBookingDates = {}
+
+  async function initBCal() {
+    const now = new Date()
+    bCalYear  = now.getFullYear()
+    bCalMonth = now.getMonth()
+
+    const today = now.toISOString().split('T')[0]
+    document.getElementById('bDate').value = today
+    document.getElementById('bDate').min   = today
+
+    await loadBBookings()
+    renderBCal()
+  }
+
+  async function loadBBookings() {
+    const start = new Date(bCalYear, bCalMonth, 1).toISOString().split('T')[0]
+    const end   = new Date(bCalYear, bCalMonth + 1, 0).toISOString().split('T')[0]
+
+    const { data } = await supabase
+      .from('tempahan_bilik')
+      .select('bilik, tarikh, masa_mula, masa_tamat, status')
+      .in('status', ['MENUNGGU', 'DISAHKAN'])
+      .gte('tarikh', start)
+      .lte('tarikh', end)
+
+    bBookingDates = {}
+    if (data) {
+      data.forEach(b => {
+        const d = b.tarikh
+        if (!d) return
+        if (!bBookingDates[d]) bBookingDates[d] = []
+        bBookingDates[d].push(b)
+      })
+    }
+  }
+
+  function renderBCal() {
+    const title = new Date(bCalYear, bCalMonth).toLocaleDateString('ms-MY', { month: 'long', year: 'numeric' })
+    document.getElementById('bCalTitle').textContent = title.toUpperCase()
+
+    const grid    = document.getElementById('bCalGrid')
+    const today   = new Date().toDateString()
+    const selDate = document.getElementById('bDate').value
+
+    const labels = grid.querySelectorAll('.cal-day-label')
+    grid.innerHTML = ''
+    labels.forEach(l => grid.appendChild(l))
+
+    const firstDay    = new Date(bCalYear, bCalMonth, 1).getDay()
+    const daysInMonth = new Date(bCalYear, bCalMonth + 1, 0).getDate()
+
+    for (let i = 0; i < firstDay; i++) {
+      const el = document.createElement('div')
+      el.className = 'cal-day empty'
+      grid.appendChild(el)
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${bCalYear}-${String(bCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`
+      const date    = new Date(bCalYear, bCalMonth, d)
+      const isPast  = date < new Date(new Date().setHours(0,0,0,0))
+
+      const el = document.createElement('div')
+      el.className = 'cal-day'
+      el.textContent = d
+
+      if (isPast) {
+        el.classList.add('past')
+      } else {
+        if (date.toDateString() === today) el.classList.add('today')
+        if (bBookingDates[dateStr]?.length > 0) el.classList.add('has-booking')
+        if (selDate === dateStr) el.classList.add('selected')
+
+        el.onclick = () => {
+          document.getElementById('bDate').value = dateStr
+          renderBCal()
+        }
+      }
+
+      grid.appendChild(el)
+    }
+  }
+
+  window.bCalNav = async function(dir) {
+    bCalMonth += dir
+    if (bCalMonth > 11) { bCalMonth = 0; bCalYear++ }
+    if (bCalMonth < 0)  { bCalMonth = 11; bCalYear-- }
+    await loadBBookings()
+    renderBCal()
+  }
+
+  window.syncBCal = function() { renderBCal() }
+
+  window.checkBilik = async function() {
+    const tarikh    = document.getElementById('bDate').value
+    const masaMula  = document.getElementById('bMasaMula').value
+    const masaTamat = document.getElementById('bMasaTamat').value
+    if (!tarikh) return
+
+    const resultsEl = document.getElementById('bResults')
+    resultsEl.innerHTML = '<div class="avail-result-title">Memuatkan...</div>'
+    resultsEl.classList.add('show')
+
+    const { data } = await supabase
+      .from('tempahan_bilik')
+      .select('bilik, tarikh, masa_mula, masa_tamat, tujuan, status')
+      .in('status', ['MENUNGGU', 'DISAHKAN'])
+      .eq('tarikh', tarikh)
+
+    // Check overlap per bilik
+    function hasOverlap(bookings, mula, tamat) {
+      return bookings.some(b => {
+        if (!b.masa_mula || !b.masa_tamat) return false
+        const bMula  = b.masa_mula.substring(0,5)
+        const bTamat = b.masa_tamat.substring(0,5)
+        return mula < bTamat && tamat > bMula
+      })
+    }
+
+    const dateLabel = new Date(tarikh).toLocaleDateString('ms-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
+    const timeLabel = masaMula && masaTamat ? ` (${masaMula} – ${masaTamat})` : ''
+
+    resultsEl.innerHTML = `
+      <div class="avail-result-title">Keputusan untuk ${dateLabel}${timeLabel}</div>
+      ${BILIK_LIST.map(bilik => {
+        const bookings    = (data || []).filter(b => b.bilik === bilik.nama)
+        const overlap     = masaMula && masaTamat ? hasOverlap(bookings, masaMula, masaTamat) : bookings.length > 0
+        const avail       = !overlap
+
+        const slots = bookings.map(b => {
+          const m = b.masa_mula ? b.masa_mula.substring(0,5) : '?'
+          const t = b.masa_tamat ? b.masa_tamat.substring(0,5) : '?'
+          return `<span class="slot-chip booked">${m}–${t}</span>`
+        }).join('')
+
+        return `
+          <div class="room-row ${avail ? 'available' : 'unavailable'}">
+            <div class="vr-left" style="flex-direction:column;align-items:flex-start;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="vr-icon ${avail ? 'available' : 'unavailable'}">${bilik.icon}</div>
+                <div>
+                  <div class="vr-name">${bilik.nama}</div>
+                  <div class="vr-info">Kapasiti: ${bilik.kapasiti} orang</div>
+                </div>
+              </div>
+              ${bookings.length > 0 ? `<div style="padding-left:48px"><div style="font-size:10px;color:var(--text-3);margin-bottom:4px">Slot ditempah:</div><div class="slot-timeline">${slots}</div></div>` : ''}
+            </div>
+            <div class="vr-right">
+              <span class="avail-badge ${avail ? 'kosong' : 'penuh'}">${avail ? '✓ Kosong' : '✗ Penuh'}</span>
+              ${avail
+                ? `<a href="bilik.html?bilik=${encodeURIComponent(bilik.nama)}&tarikh=${tarikh}&mula=${masaMula}&tamat=${masaTamat}" class="tempah-btn">Tempah →</a>`
+                : `<button class="tempah-btn disabled" disabled>Tidak Tersedia</button>`
+              }
+            </div>
+          </div>`
+      }).join('')}
+    `
+  }
+
+  init().then(() => {
+    initKCal()
+    initBCal()
+  })
 </script>
 
 </body>
