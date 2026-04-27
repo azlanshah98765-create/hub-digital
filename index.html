@@ -638,7 +638,7 @@
 
 <!-- PWA LOGIC -->
 <script>
-  const APP_URL = "https://script.google.com/macros/s/AKfycby3xoEKW11SGNL_sHdQ8dQrFqMOIbOvP7lbg31pp1XxHlqL7h-DzvRik6oA6zJgVkbC8A/exec";
+  const APP_URL = "https://hub-digital-bps-latest.vercel.app";
 
   let deferredPrompt = null;
 
@@ -702,6 +702,7 @@
     }
   }
 </script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(function(){});}</script>
 
 </body>
 </html>
